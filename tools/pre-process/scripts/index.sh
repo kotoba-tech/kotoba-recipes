@@ -2,13 +2,10 @@
 #$ -l rt_AF=1
 #$ -l h_rt=3:00:00
 #$ -j y
-#$ -o outputs/index
+#$ -o outputs/index/
 #$ -cwd
 
 source .env/bin/activate
 
 python tools/pre-process/index_dataset.py \
-  --data-file-path /groups/gaf51275/llama/datasets/JParaCrawl3.0/default_instruction_following_format.jsonl
-
-python tools/pre-process/index_dataset.py \
-  --data-file-path /groups/gaf51275/llama/datasets/JParaCrawl3.0/highquality_instruction_following_format.jsonl
+  --data-file-path /bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/sample/ja_wiki/merged_train_0.jsonl
