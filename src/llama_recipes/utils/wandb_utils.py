@@ -175,10 +175,11 @@ def log_wandb(
     num_layers: int = model.config.num_hidden_layers
     hidden_size: int = model.config.hidden_size
     vocab_size: int = model.config.vocab_size
+    intermediate_size: int = model.config.intermediate_size
 
     # tflops calculation
     flops_per_iteration: float = (
-        24
+        (8 + 4 * (intermediate_size / hidden_size))
         * checkpoint_activations_factor
         * batch_size
         * sequence_length
