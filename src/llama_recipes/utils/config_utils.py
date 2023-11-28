@@ -23,8 +23,6 @@ from llama_recipes.configs.datasets import (
     samsum_dataset,
     grammar_dataset,
     alpaca_dataset,
-    ja_wikipedia_dataset,
-    ja_en_parallel_dataset,
 )
 from llama_recipes.utils.dataset_utils import DATASET_PREPROC
 from llama_recipes.utils.distributed import print_rank_0
@@ -80,12 +78,12 @@ def generate_peft_config(train_config: Type[train_config], kwargs: dict[str, Any
 
 def generate_dataset_config(
     train_config: Type[train_config], kwargs: dict[str, Any]
-) -> samsum_dataset | grammar_dataset | alpaca_dataset | ja_wikipedia_dataset | ja_en_parallel_dataset:
+) -> samsum_dataset | grammar_dataset | alpaca_dataset:
     names = tuple(DATASET_PREPROC.keys())
 
     assert train_config.dataset in names, f"Unknown dataset: {train_config.dataset}"
 
-    dataset_config: samsum_dataset | grammar_dataset | alpaca_dataset | ja_wikipedia_dataset | ja_en_parallel_dataset = {
+    dataset_config: samsum_dataset | grammar_dataset | alpaca_dataset = {
         k: v for k, v in inspect.getmembers(datasets)
     }[train_config.dataset]()
 
