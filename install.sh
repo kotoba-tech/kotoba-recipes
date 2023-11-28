@@ -15,7 +15,6 @@ module load nccl/2.16/2.16.2-1
 module load hpcx/2.12
 
 # swich virtual env
-cd /bb/llm/gaf51275/llama/llama-recipes
 source .env/bin/activate
 
 # pip version up
