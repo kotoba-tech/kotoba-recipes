@@ -46,7 +46,7 @@ for ((i = start; i <= end; i += increment)); do
     -x MASTER_PORT=$MASTER_PORT \
     -bind-to none -map-by slot \
     -x PATH \
-    python tools/convert_mistral.py \
+    python tools/convert_ckpt.py \
     --model $BASE_MODEL_CHECKPOINT \
     --ckpt $CHECK_POINT_PATH \
     --out $OUTPUT_PATH
