@@ -38,7 +38,7 @@ for ((i = start; i <= end; i += increment)); do
 
   mkdir -p $OUTPUT_PATH
 
-  BASE_MODEL_CHECKPOINT=/groups/gcd50698/fujii/work/jr-east/hf-checkpoint/Llama-2-7b-chat-hf
+  BASE_MODEL_CHECKPOINT=/groups/gaf51217/fujii/finetune/llama2/Llama-2-7b-hf
 
   mpirun -np 8 \
     --npernode 8 \
