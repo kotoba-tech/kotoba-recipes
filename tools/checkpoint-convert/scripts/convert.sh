@@ -31,14 +31,14 @@ for ((i = start; i <= end; i += increment)); do
   ITERATION=$i
   FORMATTED_ITERATION=$(printf "iter_%07d" $ITERATION)
 
-  CHECK_POINT_PATH=/groups/gaf51275/llama/checkpoints/llama-2-7b-base/instruction/4%-sq-512/${FORMATTED_ITERATION}/model.pt
-  OUTPUT_PATH=/bb/llm/gaf51275/llama/checkpoints/parallel/4%/instruction/initial/normal/hf_checkpoint
+  CHECK_POINT_PATH=/path/to/llama/checkpoints/llama-2-7b-base/instruction/4%-sq-512/${FORMATTED_ITERATION}/model.pt
+  OUTPUT_PATH=/path/to/llama/checkpoints/parallel/4%/instruction/initial/normal/hf_checkpoint
 
   echo "convert ${CHECK_POINT_PATH} to ${OUTPUT_PATH}"
 
   mkdir -p $OUTPUT_PATH
 
-  BASE_MODEL_CHECKPOINT=/groups/gaf51217/fujii/finetune/llama2/Llama-2-7b-hf
+  BASE_MODEL_CHECKPOINT=/path/to/llama2/Llama-2-7b-hf
 
   mpirun -np 8 \
     --npernode 8 \

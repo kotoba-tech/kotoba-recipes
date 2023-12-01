@@ -78,7 +78,7 @@ SEED=42
 NUM_WORKERS_DATALOADER=2
 
 # checkpoint path
-CHECKPOINTS_PATH=/bb/llm/gaf51275/llama/checkpoints/llama-2-7b-gbs_${GLOBAL_BATCH_SIZE}-${NODE_TYPE}_${NHOSTS}
+CHECKPOINTS_PATH=/path/llama/checkpoints/llama-2-7b-gbs_${GLOBAL_BATCH_SIZE}-${NODE_TYPE}_${NHOSTS}
 mkdir -p $CHECKPOINTS_PATH
 
 # run
@@ -96,8 +96,8 @@ mpirun -np $NUM_GPUS \
   --mixed_precision \
   --pure_bf16 \
   --num_epochs $NUM_EPOCHS \
-  --model_name /groups/gaf51217/fujii/finetune/llama2/Llama-2-7b-hf \
-  --tokenizer_name /groups/gaf51217/fujii/finetune/llama2/Llama-2-7b-hf \
+  --model_name /path/to/llama2/Llama-2-7b-hf \
+  --tokenizer_name /path/to/llama2/Llama-2-7b-hf \
   --batch_size_training $BATCH_SIZE \
   --gradient_accumulation_steps $GRADIENT_ACCUMULATION_STEPS \
   --lr $LR \

@@ -8,4 +8,4 @@
 source .env/bin/activate
 
 python tools/pre-process/index_dataset.py \
-  --data-file-path /bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/sample/ja_wiki/merged_train_0.jsonl
+  --data-file-path /path/to/datasets/llama2-llm-jp-corpus/v1.0.2/sample/ja_wiki/merged_train_0.jsonl

@@ -78,7 +78,7 @@ SEED=42
 NUM_WORKERS_DATALOADER=2
 
 # checkpoint path
-CHECKPOINTS_PATH=/bb/llm/gaf51275/llama/checkpoints/llama-2-7b-gbs_${GLOBAL_BATCH_SIZE}-${NODE_TYPE}_${NHOSTS}
+CHECKPOINTS_PATH=/path/to/llama/checkpoints/llama-2-7b-gbs_${GLOBAL_BATCH_SIZE}-${NODE_TYPE}_${NHOSTS}
 mkdir -p $CHECKPOINTS_PATH
 
 export CUDA_LAUNCH_BLOCKING=1
@@ -98,8 +98,8 @@ mpirun -np $NUM_GPUS \
   --mixed_precision \
   --pure_bf16 \
   --num_epochs $NUM_EPOCHS \
-  --model_name /groups/gaf51217/fujii/finetune/llama2/Llama-2-7b-hf \
-  --tokenizer_name /groups/gaf51217/fujii/finetune/llama2/Llama-2-7b-hf \
+  --model_name /path/to/llama2/Llama-2-7b-hf \
+  --tokenizer_name /path/to/llama2/Llama-2-7b-hf \
   --batch_size_training $BATCH_SIZE \
   --gradient_accumulation_steps $GRADIENT_ACCUMULATION_STEPS \
   --lr $LR \
@@ -111,7 +111,7 @@ mpirun -np $NUM_GPUS \
   --fsdp_activation_checkpointing \
   --seed $SEED \
   --dataset "wikipedia_dataset" \
-  --train_data_path "/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/sample/ja_wiki/merged_train_0.jsonl" \
+  --train_data_path "/path/to/datasets/llama2-llm-jp-corpus/v1.0.2/sample/ja_wiki/merged_train_0.jsonl" \
   --context_size 4096 \
   --num_workers_dataloader $NUM_WORKERS_DATALOADER \
   --save_model \
