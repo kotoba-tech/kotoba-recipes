@@ -42,18 +42,20 @@ DSET_TYPE_MULTIMODAL = 'multimodal'
 DSET_TYPES = [DSET_TYPE_BERT, DSET_TYPE_ICT, DSET_TYPE_T5, DSET_TYPE_MULTIMODAL]
 
 
-def get_datasets_weights_and_num_samples(data_prefix,
-                                         train_valid_test_num_samples):
+def get_datasets_weights_and_num_samples(
+    data_prefix,
+    train_valid_test_num_samples
+) -> tuple[list[int], list[float], list[int]]:
 
     # The data prefix should be in the format of:
     #   weight-1, data-prefix-1, weight-2, data-prefix-2, ..
     assert len(data_prefix) % 2 == 0
     num_datasets = len(data_prefix) // 2
-    weights = [0]*num_datasets
-    prefixes = [0]*num_datasets
+    weights = [0] * num_datasets
+    prefixes = [0] * num_datasets
     for i in range(num_datasets):
-        weights[i] = float(data_prefix[2*i])
-        prefixes[i] = (data_prefix[2*i+1]).strip()
+        weights[i] = float(data_prefix[2 * i])
+        prefixes[i] = (data_prefix[2 * i + 1]).strip()
     # Normalize weights
     weight_sum = 0.0
     for weight in weights:
@@ -68,8 +70,7 @@ def get_datasets_weights_and_num_samples(data_prefix,
         datasets_train_valid_test_num_samples = []
         for weight in weights:
             datasets_train_valid_test_num_samples.append(
-                [int(math.ceil(val * weight * 1.005))
-                for val in train_valid_test_num_samples])
+                [int(math.ceil(val * weight * 1.005)) for val in train_valid_test_num_samples])
     else:
         # Used when separate dataset files are provided for train,
         # valid and test
@@ -114,10 +115,11 @@ def get_a_and_b_segments(sample, np_rng):
 
 def truncate_segments(tokens_a, tokens_b, len_a, len_b, max_num_tokens, np_rng):
     """Truncates a pair of sequences to a maximum sequence length."""
-    #print(len_a, len_b, max_num_tokens)
     assert len_a > 0
+
     if len_a + len_b <= max_num_tokens:
         return False
+
     while len_a + len_b > max_num_tokens:
         if len_a > len_b:
             len_a -= 1
@@ -522,7 +524,7 @@ def _build_train_valid_test_datasets(data_prefix, splits_string,
             assert indexed_dataset.document_indices.shape[0] == \
                 (total_num_of_documents + 1)
         return dataset
-    
+
     train_dataset = build_split_dataset(0, 'train')
     valid_dataset = build_split_dataset(1, 'valid')
     test_dataset = build_split_dataset(2, 'test')
@@ -653,6 +655,7 @@ def get_train_valid_test_split_(splits_string, size):
     assert len(splits_index) == 4
     assert splits_index[-1] == size
     return splits_index
+
 
 def get_samples_mapping(indexed_dataset,
                         data_prefix,

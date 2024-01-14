@@ -51,7 +51,7 @@ class BlendedDataset(torch.utils.data.Dataset):
         # Alert user to unnecessary blending
         if len(datasets) == 1:
             log_single_rank(
-                logger, logging.WARNING, f"Building a BlendedDataset for a single MegatronDataset"
+                logger, logging.WARNING, "Building a BlendedDataset for a single MegatronDataset"
             )
 
         # Redundant normalization for bitwise identical comparison with Megatron-LM
