@@ -18,7 +18,7 @@ def test_custom_dataset(step_lr, optimizer, tokenizer, get_model, train, mocker)
     kwargs = {
         "dataset": "custom_dataset",
         "custom_dataset.file": "examples/custom_dataset.py",
-        "batch_size_training": 1,
+        "batch_size": 1,
         "use_peft": False,
         }
     
@@ -51,7 +51,7 @@ def test_unknown_dataset_error(step_lr, optimizer, tokenizer, get_model, train, 
     kwargs = {
         "dataset": "custom_dataset",
         "custom_dataset.file": "examples/custom_dataset.py:get_unknown_dataset",
-        "batch_size_training": 1,
+        "batch_size": 1,
         "use_peft": False,
         }
     with pytest.raises(AttributeError):

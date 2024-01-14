@@ -3,5 +3,9 @@
 
 from llama_recipes.datasets.grammar_dataset.grammar_dataset import get_dataset as get_grammar_dataset
 from llama_recipes.datasets.alpaca_dataset import InstructionDataset as get_alpaca_dataset
+from llama_recipes.datasets.customer_suuport_dataset import CustomerSupportDataset as get_customer_support_dataset
+from llama_recipes.datasets.driver_license_dataset import DriverLicenseDataset as get_driver_license_dataset
 from llama_recipes.datasets.samsum_dataset import get_preprocessed_samsum as get_samsum_dataset
-from llama_recipes.datasets.wikipedia_dataset import WikipediaDataset as get_wikipedia_dataset
+from llama_recipes.datasets.jpara_dataset import JapaneseEnglishParallelDataset as get_ja_en_parallel_dataset
+from llama_recipes.datasets.stability_instruct_dataset import StabilityInstructDataset as get_stability_instruct_dataset
+from llama_recipes.datasets.pubmed_dataset import PUBMEDDataset as get_pubmed_dataset

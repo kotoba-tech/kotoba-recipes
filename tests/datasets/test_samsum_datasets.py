@@ -16,7 +16,7 @@ def test_custom_dataset(step_lr, optimizer, tokenizer, get_model, train, mocker)
     
     
     kwargs = {
-        "batch_size_training": 1,
+        "batch_size": 1,
         "use_peft": False,
         "dataset": "samsum_dataset",
         }

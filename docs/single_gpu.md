@@ -75,7 +75,7 @@ It let us specify the training settings, everything from `model_name` to `datase
 model_name: str="PATH/to/LLAMA 2/7B"
 enable_fsdp: bool= False
 run_validation: bool=True
-batch_size_training: int=4
+batch_size: int=4
 gradient_accumulation_steps: int=1
 num_epochs: int=3
 num_workers_dataloader: int=2
@@ -84,7 +84,7 @@ weight_decay: float=0.0
 gamma: float= 0.85
 use_fp16: bool=False
 mixed_precision: bool=True
-val_batch_size: int=4
+batch_size: int=4
 dataset = "samsum_dataset" # alpaca_dataset,grammar_dataset
 peft_method: str = "lora" # None , llama_adapter, prefix
 use_peft: bool=False

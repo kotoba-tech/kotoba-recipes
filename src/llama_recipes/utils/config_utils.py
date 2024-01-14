@@ -17,19 +17,20 @@ from llama_recipes.configs import (  # noqa: F401
     llama_adapter_config,
     prefix_config,
     train_config,
-    fsdp_config,
 )
 from llama_recipes.configs.datasets import (
     samsum_dataset,
     grammar_dataset,
     alpaca_dataset,
+    ja_wikipedia_dataset,
+    ja_en_parallel_dataset,
 )
 from llama_recipes.utils.dataset_utils import DATASET_PREPROC
 from llama_recipes.utils.distributed import print_rank_0
 
 
 def update_config(
-    config: tuple[Type[train_config | fsdp_config]] | Type[train_config | fsdp_config] | Any,
+    config: Type[train_config] | Any,
     **kwargs: dict[str, Any],
 ) -> None:
     if isinstance(config, (tuple, list)):
@@ -78,12 +79,12 @@ def generate_peft_config(train_config: Type[train_config], kwargs: dict[str, Any
 
 def generate_dataset_config(
     train_config: Type[train_config], kwargs: dict[str, Any]
-) -> samsum_dataset | grammar_dataset | alpaca_dataset:
+) -> samsum_dataset | grammar_dataset | alpaca_dataset | ja_wikipedia_dataset | ja_en_parallel_dataset:
     names = tuple(DATASET_PREPROC.keys())
 
     assert train_config.dataset in names, f"Unknown dataset: {train_config.dataset}"
 
-    dataset_config: samsum_dataset | grammar_dataset | alpaca_dataset = {
+    dataset_config: samsum_dataset | grammar_dataset | alpaca_dataset | ja_wikipedia_dataset | ja_en_parallel_dataset = {
         k: v for k, v in inspect.getmembers(datasets)
     }[train_config.dataset]()
 

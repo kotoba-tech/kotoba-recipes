@@ -14,19 +14,16 @@ from torch.distributed.fsdp.fully_sharded_data_parallel import CPUOffload  # typ
 import torch.optim as optim
 import wandb
 import typing
-import deepspeed  # noqa: F401
 from peft import get_peft_model, prepare_model_for_int8_training  # type: ignore
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP  # type: ignore
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DistributedSampler
 from torch.utils.data import DataLoader
 from transformers import (
-    AutoTokenizer,
     default_data_collator,
 )
-from transformers.models.llama.modeling_llama import LlamaDecoderLayer
 
-from llama_recipes.configs import fsdp_config, train_config
+from llama_recipes.configs import train_config
 from llama_recipes.policies import AnyPrecisionAdamW, apply_fsdp_checkpointing
 from llama_recipes.utils import fsdp_auto_wrap_policy
 from llama_recipes.utils.config_utils import (
@@ -45,8 +42,6 @@ from llama_recipes.utils.train_utils import (
 )
 from llama_recipes.optimizer import WarmupCosineAnnealingLR
 from llama_recipes.utils.sequence_length_warmup import (  # noqa: F401
-    SequenceLengthWarmupDistributedSampler,  # noqa: F401
-    SequenceLengthWarmupDataset,  # noqa: F401
     CustomDistributedSampler,
 )
 from llama_recipes.utils.random import set_seed
@@ -59,11 +54,14 @@ from llama_recipes.utils.distributed import (
     get_world_size,
 )
 from llama_recipes.get_models import get_model
+from llama_recipes.get_tokenizer import get_tokenizer
+from llama_recipes.get_model_decoder_layer import get_model_decoder_layer
 from llama_recipes.utils.checkpoint import (
     load_model_state_dict,
     load_optimizer_state_dict,
     load_scheduler_state_dict,
     load_sampler_state_dict,
+    load_rng_state_dict,
 )
 
 
@@ -76,7 +74,7 @@ def main(**kwargs) -> None:
     logging.basicConfig(level=logging.WARNING)
 
     # Update the configuration for the training and sharding process
-    update_config((train_config, fsdp_config), **kwargs)  # type: ignore
+    update_config((train_config), **kwargs)  # type: ignore
 
     # Set the seeds for reproducibility
     set_seed(train_config)
@@ -85,6 +83,7 @@ def main(**kwargs) -> None:
     if train_config.use_mpi:
         set_mpi_env()
 
+    rank = 0
     if train_config.enable_fsdp:
         rank = int(os.environ["RANK"])
         world_size = int(os.environ["WORLD_SIZE"])
@@ -114,6 +113,11 @@ def main(**kwargs) -> None:
         clear_gpu_cache(get_local_rank())  # type: ignore
         setup_environ_flags(get_rank())  # type: ignore
 
+    # random seed
+    if train_config.load_checkpoint_path:
+        load_rng_state_dict(train_config.load_checkpoint_path)
+        torch_distributed.barrier()
+
     # Load the pre-trained model and setup its configuration
     use_cache = False if train_config.enable_fsdp else None
     model = get_model(train_config, use_cache=use_cache)  # type: ignore
@@ -141,12 +145,10 @@ def main(**kwargs) -> None:
         model = prepare_model_for_int8_training(model)
 
     # Convert the model to bfloat16 if fsdp and pure_bf16 is enabled
-    if train_config.enable_fsdp and fsdp_config.pure_bf16:
+    if train_config.enable_fsdp and train_config.use_bf16:
         model.to(torch.bfloat16)  # type: ignore
 
-    # Load the tokenizer and add special tokens
-    tokenizer = AutoTokenizer.from_pretrained(train_config.tokenizer_name)
-    tokenizer.add_special_tokens({"pad_token": "<PAD>"})
+    tokenizer = get_tokenizer(train_config)  # type: ignore
 
     if train_config.use_peft:
         print(f"Using PEFT method: {train_config.peft_method}", flush=True)
@@ -160,24 +162,35 @@ def main(**kwargs) -> None:
             print_rank_0("NOTE: freeze transformer layers")
             freeze_transformer_layers(model=model, num_layer=train_config.num_freeze_layers)
 
-        mixed_precision_policy, wrapping_policy = get_policies(fsdp_config, get_rank())
-        my_auto_wrapping_policy = fsdp_auto_wrap_policy(model, LlamaDecoderLayer)
+        mixed_precision_policy, wrapping_policy = get_policies(
+            cfg=train_config,
+            rank=get_rank(),
+            model_name=train_config.model_name,
+        )
+        my_auto_wrapping_policy = fsdp_auto_wrap_policy(
+            model=model,
+            transformer_layer_name=get_model_decoder_layer(
+                model_name=train_config.model_name,
+            )
+        )
 
         model = FSDP(
             model,  # type: ignore
             auto_wrap_policy=my_auto_wrapping_policy if train_config.use_peft else wrapping_policy,
-            cpu_offload=CPUOffload(offload_params=True) if fsdp_config.fsdp_cpu_offload else None,
-            mixed_precision=mixed_precision_policy if not fsdp_config.pure_bf16 else None,
-            sharding_strategy=fsdp_config.sharding_strategy,
+            cpu_offload=CPUOffload(offload_params=True) if train_config.fsdp_cpu_offload else None,
+            mixed_precision=mixed_precision_policy,
+            sharding_strategy=train_config.sharding_strategy,
             device_id=torch.cuda.current_device(),
             limit_all_gathers=True,
             sync_module_states=train_config.low_cpu_fsdp,
-            param_init_fn=lambda module: module.to_empty(device=torch.device("cuda"), recurse=False)  # type: ignore
+            param_init_fn=lambda module: module.to_empty(  # type: ignore
+                device=torch.cuda.current_device(), recurse=False,  # type: ignore
+            )
             if train_config.low_cpu_fsdp and rank != 0
             else None,
         )
-        if fsdp_config.fsdp_activation_checkpointing:
-            apply_fsdp_checkpointing(model)
+        if train_config.fsdp_activation_checkpointing:
+            apply_fsdp_checkpointing(model=model, model_name=train_config.model_name)
     elif not train_config.quantization and not train_config.enable_fsdp:
         model.to("cuda")  # type: ignore
 
@@ -210,7 +223,7 @@ def main(**kwargs) -> None:
     estimated_total_iterations: int = (
         train_config.num_epochs
         * len(dataset_train)  # type: ignore
-        // (train_config.batch_size_training * get_world_size() * train_config.gradient_accumulation_steps)
+        // (train_config.batch_size * get_world_size() * train_config.gradient_accumulation_steps)
     )
     lr_warmup_iterations: int = int(estimated_total_iterations * train_config.lr_warmup)
     lr_decay_iterations: int = int(estimated_total_iterations * train_config.lr_decay)
@@ -219,23 +232,21 @@ def main(**kwargs) -> None:
     if is_rank_0():
         print(f"dataset_train: {dataset_length}")  # type: ignore
 
-    train_sampler = None
     val_sampler = None
-    if train_config.enable_fsdp:
-        train_sampler = CustomDistributedSampler(
-            dataset_train,
+    train_sampler = CustomDistributedSampler(
+        dataset_train,
+        rank=torch_distributed.get_rank(),
+        num_replicas=torch_distributed.get_world_size(),
+        shuffle=True,
+        seed=train_config.seed,
+    )
+    if train_config.run_validation:
+        val_sampler = DistributedSampler(
+            dataset_val,  # type: ignore
             rank=torch_distributed.get_rank(),
             num_replicas=torch_distributed.get_world_size(),
-            shuffle=True,
             seed=train_config.seed,
         )
-        if train_config.run_validation:
-            val_sampler = DistributedSampler(
-                dataset_val,  # type: ignore
-                rank=torch_distributed.get_rank(),
-                num_replicas=torch_distributed.get_world_size(),
-                seed=train_config.seed,
-            )
 
     if train_config.load_checkpoint_path:
         load_sampler_state_dict(train_sampler, train_config.load_checkpoint_path)
@@ -249,7 +260,7 @@ def main(**kwargs) -> None:
 
     train_dataloader: DataLoader = DataLoader(
         dataset=dataset_train,
-        batch_size=train_config.batch_size_training,
+        batch_size=train_config.batch_size,
         num_workers=train_config.num_workers_dataloader,
         pin_memory=True,
         sampler=train_sampler if train_sampler else None,
@@ -262,7 +273,7 @@ def main(**kwargs) -> None:
     if train_config.run_validation:
         eval_dataloader = DataLoader(
             dataset_val,  # type: ignore
-            batch_size=train_config.val_batch_size,
+            batch_size=train_config.batch_size,
             num_workers=train_config.num_workers_dataloader,
             pin_memory=True,
             sampler=val_sampler if val_sampler else None,
@@ -271,7 +282,7 @@ def main(**kwargs) -> None:
         )
 
     # Initialize the optimizer and learning rate scheduler
-    if fsdp_config.pure_bf16 and fsdp_config.optimizer == "anyprecision":
+    if train_config.use_bf16 and train_config.optimizer == "anyprecision":
         optimizer = AnyPrecisionAdamW(
             model.parameters(),  # type: ignore
             lr=train_config.lr,
@@ -330,7 +341,6 @@ def main(**kwargs) -> None:
         lr_scheduler=scheduler,
         gradient_accumulation_steps=train_config.gradient_accumulation_steps,
         train_config=train_config,
-        fsdp_config=fsdp_config if train_config.enable_fsdp else None,
         local_rank=get_local_rank() if train_config.enable_fsdp else None,
         rank=get_rank() if train_config.enable_fsdp else None,
     )

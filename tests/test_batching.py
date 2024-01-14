@@ -17,8 +17,8 @@ def test_packing(step_lr, optimizer, get_model, tokenizer, train, mocker, setup_
 
     kwargs = {
         "model_name": "decapoda-research/llama-7b-hf",
-        "batch_size_training": 8,
-        "val_batch_size": 1,
+        "batch_size": 8,
+        "batch_size": 1,
         "use_peft": False,
         "dataset": "samsum_dataset",
         "batching_strategy": "packing",
@@ -70,8 +70,8 @@ def test_distributed_packing(dist, is_initialized, fsdp, setup, step_lr, optimiz
 
     kwargs = {
         "model_name": "decapoda-research/llama-7b-hf",
-        "batch_size_training": 8,
-        "val_batch_size": 1,
+        "batch_size": 8,
+        "batch_size": 1,
         "use_peft": False,
         "dataset": "samsum_dataset",
         "batching_strategy": "packing",

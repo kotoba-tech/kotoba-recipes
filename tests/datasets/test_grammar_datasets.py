@@ -19,8 +19,8 @@ def test_grammar_dataset(step_lr, optimizer, get_model, tokenizer, train, mocker
     BATCH_SIZE = 8
     kwargs = {
         "model_name": "decapoda-research/llama-7b-hf",
-        "batch_size_training": BATCH_SIZE,
-        "val_batch_size": 1,
+        "batch_size": BATCH_SIZE,
+        "batch_size": 1,
         "use_peft": False,
         "dataset": "grammar_dataset",
         "batching_strategy": "padding",

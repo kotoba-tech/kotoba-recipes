@@ -9,6 +9,8 @@ from torch.distributed.fsdp import (  # noqa: F401
 from torch.distributed.fsdp.api import FullOptimStateDictConfig
 from pathlib import Path
 import os
+from typing import Type
+from llama_recipes.configs.training import train_config
 
 
 def get_model_state_dict(model: FSDP) -> dict[str, torch.Tensor]:
@@ -64,6 +66,29 @@ def save_sampler_state_dict(sampler: torch.utils.data.distributed.DistributedSam
         print(f"Saved sampler indices to {path}")
 
 
+def save_rng_state(path: str) -> None:
+    # PyTorch
+    torch_cpu_rng_state = torch.get_rng_state()
+    torch_gpu_rng_state = torch.cuda.get_rng_state()
+    # Numpy
+    import numpy
+    np_rng_state = numpy.random.get_state()
+    # random
+    import random
+    py_rng_state = random.getstate()
+
+    # save
+    if torch_distributed.get_rank() == 0:
+        print(f"Saving RNG states to {path}")
+        torch.save({
+            'torch_cpu_rng_state': torch_cpu_rng_state,
+            'torch_gpu_rng_state': torch_gpu_rng_state,
+            'np_rng_state': np_rng_state,
+            'py_rng_state': py_rng_state,
+        }, path)
+        print(f"Saved RNG states to {path}")
+
+
 def save_checkpoint(
     model: FSDP,
     optimizer: torch.optim.Optimizer,
@@ -71,6 +96,7 @@ def save_checkpoint(
     scheduler: torch.optim.lr_scheduler.LRScheduler,
     path: str,
     iteration: int,
+    train_config: Type[train_config],
 ) -> None:
     torch_distributed.barrier()
 
@@ -84,11 +110,12 @@ def save_checkpoint(
         model=model,
         path=f"{checkpoint_path}/model.pt",
     )
-    save_optimizer_state_dict(
-        model=model,
-        optimizer=optimizer,
-        path=f"{checkpoint_path}/optimizer.pt",
-    )
+    if train_config.save_optimizer:
+        save_optimizer_state_dict(
+            model=model,
+            optimizer=optimizer,
+            path=f"{checkpoint_path}/optimizer.pt",
+        )
     save_scheduler_state_dict(
         scheduler=scheduler,
         path=f"{checkpoint_path}/scheduler.pt",
@@ -96,6 +123,9 @@ def save_checkpoint(
     save_sampler_state_dict(
         sampler=sampler,
         path=f"{checkpoint_path}/sampler.pt",
+    )
+    save_rng_state(
+        path=f"{checkpoint_path}/rng.pt",
     )
 
     torch_distributed.barrier()
@@ -119,7 +149,7 @@ def load_model_state_dict(model: torch.nn.Module, path: str) -> None:
         print(f"Loading model state dict from {latest_checkpoint_path}/model.pt")
 
     state_dict = torch.load(f"{latest_checkpoint_path}/model.pt", map_location="cpu")
-    model.load_state_dict(state_dict, assign=True)  # assign checkpoint tensor
+    model.load_state_dict(state_dict)
     del state_dict
 
     if torch_distributed.get_rank() == 0:
@@ -175,6 +205,26 @@ def load_sampler_state_dict(sampler: torch.utils.data.distributed.DistributedSam
     del state_dict
 
 
+def load_rng_state_dict(path: str) -> None:
+    import numpy
+    import random
+
+    latest_iteration: int = get_latest_iteration(path)
+    if latest_iteration == 0:
+        return
+
+    latest_checkpoint_path: str = get_checkpoint_name(
+        path, latest_iteration
+    )
+    rng_states = torch.load(f"{latest_checkpoint_path}/rng.pt", map_location="cpu")
+    torch.set_rng_state(rng_states['torch_cpu_rng_state'])
+    torch.cuda.set_rng_state(rng_states['torch_gpu_rng_state'])
+    numpy.random.set_state(rng_states['np_rng_state'])
+    random.setstate(rng_states['py_rng_state'])
+
+    del rng_states
+
+
 def read_latest_value(file_path: str) -> int:
     try:
         with open(file_path, "r") as file:
@@ -183,10 +233,10 @@ def read_latest_value(file_path: str) -> int:
     except FileNotFoundError:
         if torch_distributed.get_rank() == 0:
             print(f"File not found: {file_path}")
-        raise
+        raise FileNotFoundError
     except ValueError:
         print(f"Unable to convert file content to integer: {file_path}")
-        raise
+        raise ValueError
 
 
 def get_latest_iteration(path: str) -> int:

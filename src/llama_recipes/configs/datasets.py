@@ -25,7 +25,7 @@ class alpaca_dataset:
     dataset: str = "alpaca_dataset"
     train_split: str = "train"
     test_split: str = "val"
-    data_path: str = "src/llama_recipes/datasets/alpaca_data.json"
+    data_path: str = "llama-recipes/src/llama_recipes/datasets/alpaca_data.json"
 
 
 @dataclass
@@ -37,8 +37,64 @@ class custom_dataset:
 
 
 @dataclass
-class wikipedia_dataset:
-    dataset: str = "wikipedia_dataset"
+class ja_wikipedia_dataset:
+    dataset: str = "ja_wiki_dataset"
+    context_size: int = 4096  # sequence length
+    train_split: str = "train"
+    test_split: str = "test"
+
+
+@dataclass
+class llm_jp_dataset:
+    dataset: str = "llm_jp_dataset"
+    context_size: int = 4096  # sequence length
+    train_split: str = "train"
+    test_split: str = "test"
+
+
+@dataclass
+class customer_support_dataset:
+    dataset: str = "customer_support_dataset"
+    context_size: int = 4096
+    train_split: str = "train"
+    test_split: str = "val"
+    train_data_path: str = ""
+    val_data_path: str = ""
+
+
+@dataclass
+class driver_license_dataset:
+    dataset: str = "driver_license_dataset"
+    context_size: int = 4096
+    train_split: str = "train"
+    test_split: str = "val"
+    train_data_path: str = ""
+    val_data_path: str = ""
+
+
+@dataclass
+class ja_en_parallel_dataset:
+    dataset: str = "ja_en_parallel_dataset"
+    context_size: int = 4096
+    train_split: str = "train"
+    test_split: str = "val"
+    train_data_path: str = ""
+    val_data_path: str = ""
+
+
+@dataclass
+class stability_instruct_dataset:
+    dataset: str = "stability_instruct_dataset"
+    context_size: int = 4096
+    train_split: str = "train"
+    test_split: str = "val"
+    train_data_path: str = ""
+    val_data_path: str = ""
+
+
+@dataclass
+class pubmed_dataset:
+    dataset: str = "pubmed_dataset"
     context_size: int = 4096
     train_split: str = "train"
     test_split: str = "val"

@@ -98,23 +98,23 @@ class CustomDistributedSampler(DistributedSampler):
         super().__init__(*args, **kwargs)
         self.generator = torch.Generator()
         self.generator.manual_seed(self.seed)  # seed is defined in the parent class
-        self.current_iteration = 0
+        self.current_epoch = 0
 
-    def set_iteration(self, iteration: int) -> None:
-        self.current_iteration: int = iteration
+    def set_epoch(self, epoch: int) -> None:
+        self.current_epoch: int = epoch
 
     def state_dict(self) -> dict[str, Any]:
-        return {"current_iteration": self.current_iteration, "generator_state": self.generator.get_state()}
+        return {"current_epoch": self.current_epoch, "generator_state": self.generator.get_state()}
 
     def load_state_dict(self, state_dict):
-        self.current_iteration = state_dict["current_iteration"]
+        self.current_epoch = state_dict["current_epoch"]
         self.generator.set_state(state_dict["generator_state"])
 
     def __iter__(self):
-        # Set the seed for shuffling based on the current iteration and generator state
+        # Set the seed for shuffling based on the current epoch and generator state
         g = torch.Generator()
         g.set_state(self.generator.get_state())
-        g.manual_seed(self.current_iteration)
+        g.manual_seed(self.current_epoch)
 
         # dataset
         dataset_length: int = len(self.dataset)  # type: ignore
