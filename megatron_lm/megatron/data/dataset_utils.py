@@ -36,23 +36,24 @@ from megatron.core.datasets.indexed_dataset import MMapIndexedDataset
 
 DSET_TYPE_BERT = 'standard_bert'
 DSET_TYPE_ICT = 'ict'
-DSET_TYPE_T5  = 't5'
+DSET_TYPE_T5 = 't5'
 DSET_TYPE_MULTIMODAL = 'multimodal'
 
 DSET_TYPES = [DSET_TYPE_BERT, DSET_TYPE_ICT, DSET_TYPE_T5, DSET_TYPE_MULTIMODAL]
 
 
 def get_datasets_weights_and_num_samples(
-    data_prefix,
-    train_valid_test_num_samples
-) -> tuple[list[int], list[float], list[int]]:
+    data_prefix: list[str],
+    train_valid_test_num_samples: list[float] | float,
+) -> tuple[list[str], list[float], list[int]]:
 
     # The data prefix should be in the format of:
     #   weight-1, data-prefix-1, weight-2, data-prefix-2, ..
     assert len(data_prefix) % 2 == 0
-    num_datasets = len(data_prefix) // 2
-    weights = [0] * num_datasets
-    prefixes = [0] * num_datasets
+    num_datasets: int = len(data_prefix) // 2
+    weights: list[float] = [0] * num_datasets
+    prefixes: list[str] = [""] * num_datasets
+
     for i in range(num_datasets):
         weights[i] = float(data_prefix[2 * i])
         prefixes[i] = (data_prefix[2 * i + 1]).strip()
@@ -63,14 +64,14 @@ def get_datasets_weights_and_num_samples(
     assert weight_sum > 0.0
     weights = [weight / weight_sum for weight in weights]
 
-    # Add 0.5% (the 1.005 factor) so in case the bleding dataset does
+    # Add 0.5% (the 1.005 factor) so in case the blending dataset does
     # not uniformly distribute the number of samples, we still have
     # samples left to feed to the network.
     if isinstance(train_valid_test_num_samples, list):
-        datasets_train_valid_test_num_samples = []
+        datasets_train_valid_test_num_samples: list[int] = []
         for weight in weights:
             datasets_train_valid_test_num_samples.append(
-                [int(math.ceil(val * weight * 1.005)) for val in train_valid_test_num_samples])
+                [int(math.ceil(val * weight * 1.005)) for val in train_valid_test_num_samples])  # type: ignore
     else:
         # Used when separate dataset files are provided for train,
         # valid and test
@@ -532,10 +533,17 @@ def _build_train_valid_test_datasets(data_prefix, splits_string,
     return (train_dataset, valid_dataset, test_dataset)
 
 
-def build_dataset(name, data_prefix, max_num_samples,
-                  max_seq_length, seed, binary_head,
-                  max_seq_length_dec, dataset_type='standard_bert',
-                  indexed_dataset=None):
+def build_dataset(
+    name,
+    data_prefix,
+    max_num_samples,
+    max_seq_length,
+    seed,
+    binary_head,
+    max_seq_length_dec,
+    dataset_type='standard_bert',
+    indexed_dataset=None
+):
 
     from megatron.data.bert_dataset import BertDataset
     from megatron.data.ict_dataset import ICTDataset
@@ -546,8 +554,9 @@ def build_dataset(name, data_prefix, max_num_samples,
         raise ValueError("Invalid dataset_type: ", dataset_type)
 
     if indexed_dataset is None:
-        indexed_dataset = get_indexed_dataset_(data_prefix,
-                                               dataset_type)
+        indexed_dataset = get_indexed_dataset_(
+            data_prefix, dataset_type
+        )
 
     kwargs = dict(
         name=name,
@@ -715,12 +724,12 @@ def get_samples_mapping(indexed_dataset,
             seed,
             verbose,
             2 if binary_head else 1)
-        print_rank_0(' > done building samples index maping')
+        print_rank_0(' > done building samples index mapping')
         np.save(indexmap_filename, samples_mapping, allow_pickle=True)
         print_rank_0(' > saved the index mapping in {}'.format(
             indexmap_filename))
         # Make sure all the ranks have built the mapping
-        print_rank_0(' > elasped time to build and save samples mapping '
+        print_rank_0(' > elapsed time to build and save samples mapping '
                      '(seconds): {:4f}'.format(
                          time.time() - start_time))
     # This should be a barrier but nccl barrier assumes
