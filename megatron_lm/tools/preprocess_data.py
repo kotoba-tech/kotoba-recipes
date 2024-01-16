@@ -7,11 +7,13 @@ import json
 import os
 import sys
 
-sys.path.append(
-    os.path.abspath(
-        os.path.join(os.path.dirname(__file__), os.path.pardir)
-    )
+root_dir = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
 )
+
+sys.path.append(root_dir)
+sys.path.append(f"{root_dir}/src")
+
 import time
 import gzip
 import glob

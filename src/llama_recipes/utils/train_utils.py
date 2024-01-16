@@ -201,6 +201,12 @@ def evaluation(
     while iteration < args.eval_iters:
         iteration += 1
         batch = next(eval_dataloader)
+
+        del batch["dataset_id"]
+        del batch["attention_mask"]
+        batch["attention_mask"] = batch["loss_mask"]
+        del batch["loss_mask"]
+
         for key in batch.keys():
             batch[key] = batch[key].to(local_rank)
 

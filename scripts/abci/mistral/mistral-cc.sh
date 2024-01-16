@@ -1,6 +1,6 @@
 #!/bin/bash
-#$ -l rt_AF=4
-#$ -l h_rt=0:9:00:00
+#$ -l rt_AF=8
+#$ -l h_rt=0:7:00:00
 #$ -j y
 #$ -o outputs/mistral-7b/okazaki-cc/
 #$ -cwd
@@ -72,6 +72,8 @@ DATASET_DIR=/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/tokenize
 DATA_PATH=""
 
 DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/val_ja_wiki_text_document"
+DATA_PATH="${DATA_PATH} 2493597126 ${DATASET_DIR}/train_ja_wiki_text_document"
+DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/en_books_text_document"
 
 # run
 mpirun -np $NUM_GPUS \
@@ -100,8 +102,8 @@ mpirun -np $NUM_GPUS \
   --optimizer adam \
   --adam-beta1 0.9 \
   --adam-beta2 0.95 \
-  --save-interval 500 \
-  --eval-interval 100 \
+  --save-interval 20 \
+  --eval-interval 10 \
   --eval-iters 10 \
   --bf16 \
   --mixed-precision \
