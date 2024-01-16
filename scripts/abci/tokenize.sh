@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -l rt_AF=1
+#$ -l rt_F=1
 #$ -l h_rt=24:00:00
 #$ -j y
 #$ -o outputs/tokenize/
@@ -13,15 +13,18 @@ module load nccl/2.16/2.16.2-1
 module load hpcx/2.12
 
 # swich virtual env
-cd /bb/llm/gaf51275/llama/llama-recipes/
 source .env/bin/activate
 
-# hugginface setting cache
-export HF_HOME=/bb/llm/gaf51275/.cache/huggingface
+DATASET_DIR=/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/sample/val_ja_cc_wiki
+OUTPUT_DIR=/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/tokenized/mistral
 
-cd scripts/abci
-# tokenize
+mkdir -p ${OUTPUT_DIR}
 
-for ((i=1; i<=1; i++)); do
-  python llm_jp_tokenize.py $i
-done
+# tokenize japanese wikipedia
+python megatron_lm/tools/preprocess_data.py \
+  --input ${DATASET_DIR}/validation_ja_wiki_0.jsonl \
+  --output-prefix ${OUTPUT_DIR}/val_ja_wiki \
+  --tokenizer-type Llama2Tokenizer \
+  --tokenizer-model /bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1/tokenizer.model \
+  --append-eod \
+  --workers 64

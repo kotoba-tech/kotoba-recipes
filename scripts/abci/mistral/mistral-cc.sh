@@ -1,6 +1,6 @@
 #!/bin/bash
-#$ -l rt_AF=1
-#$ -l h_rt=2:10:00:00
+#$ -l rt_AF=4
+#$ -l h_rt=0:10:00:00
 #$ -j y
 #$ -o outputs/mistral-7b/okazaki-cc/
 #$ -cwd
@@ -43,16 +43,6 @@ while read -r line; do
   echo "${line} slots=${NUM_GPU_PER_NODE}"
 done <"$SGE_JOB_HOSTLIST" >"$HOSTFILE_NAME"
 
-# debugging flag
-export LOGLEVEL=INFO
-export NCCL_DEBUG=WARN
-export NCCL_DEBUG_SUBSYS=WARN
-export PYTHONFAULTHANDLER=1
-export CUDA_LAUNCH_BLOCKING=0
-
-# training settings
-NUM_EPOCHS=2
-
 # batch size
 BATCH_SIZE=2
 GLOBAL_BATCH_SIZE=128
@@ -63,27 +53,35 @@ if (($GRADIENT_ACCUMULATION_STEPS < 1)); then
   exit 1
 fi
 
-# optimizer
-LR=1e-5
-LR_MIN=1e-6
-LR_DECAY=0.80
-LR_WARMUP=0.05
-LR_DECAY_STYLE="cosine"
+# training config
+SEQ_LENGTH=4096
+DATA_PARALLEL_SIZE=$NUM_GPUS
+
+MICRO_BATCH_SIZE=2
+GLOBAL_BATCH_SIZE=1024
+TRAIN_STEPS=25000
+
+# optimizer config
+LR=1e-4
+MIN_LR=3.3e-6
+LR_WARMUP_STEPS=1000
+LR_DECAY_STEPS=25000
 WEIGHT_DECAY=0.1
+GRAD_CLIP=1
 
-# seed
-SEED=42
+# checkpoint & tokenizer
+TOKENIZER_MODEL=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1/tokenizer.model
+CHECKPOINT_DIR=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mixtral-8x7B-v0.1
+CHECKPOINT_SAVE_DIR=/groups/gaf51275/llama/checkpoints/mistral-7b/test
 
-# dataset
-NUM_WORKERS_DATALOADER=2
-DATASET_DIR="/groups/gaf51275/llama/datasets/instruct/llm-jp-gpt4-self-instruct"
+mkdir -p ${CHECKPOINT_SAVE_DIR}
 
-# checkpoint path
-CHECKPOINTS_PATH=/groups/gaf51275/llama/checkpoints/mistral-7b/instruct/gpt-4/gb-128
-mkdir -p $CHECKPOINTS_PATH
+# data config
+DATASET_DIR=/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/tokenized/mistral
 
-# model dir
-MODEL_DIR=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1
+DATA_PATH=""
+
+DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/val_ja_wiki"
 
 # run
 mpirun -np $NUM_GPUS \
@@ -94,34 +92,37 @@ mpirun -np $NUM_GPUS \
   -bind-to none -map-by slot \
   -x PATH \
   python examples/finetuning.py \
-  --enable_fsdp \
-  --low_cpu_fsdp \
-  --mixed_precision \
-  --use_bf16 \
-  --num_epochs $NUM_EPOCHS \
-  --model_name $MODEL_DIR \
-  --tokenizer_name $MODEL_DIR \
-  --batch_size $BATCH_SIZE \
-  --gradient_accumulation_steps $GRADIENT_ACCUMULATION_STEPS \
-  --fsdp_activation_checkpointing \
-  --lr $LR \
-  --lr_min $LR_MIN \
-  --lr_warmup $LR_WARMUP \
-  --lr_decay $LR_DECAY \
-  --lr_decay_style $LR_DECAY_STYLE \
-  --weight_decay $WEIGHT_DECAY \
-  --seed $SEED \
-  --dataset "stability_instruct_dataset" \
-  --train_data_path $DATASET_DIR/train_data.jsonl \
-  --run_validation \
-  --val_data_path $DATASET_DIR/val_data.jsonl \
-  --num_workers_dataloader $NUM_WORKERS_DATALOADER \
-  --save_model \
-  --save_optimizer \
-  --save_interval_iteration 100 \
-  --save_checkpoint_path $CHECKPOINTS_PATH \
-  --load_checkpoint_path $CHECKPOINTS_PATH \
-  --use_mpi \
+  --seq-length ${SEQ_LENGTH} \
+  --micro-batch-size ${MICRO_BATCH_SIZE} \
+  --global-batch-size ${GLOBAL_BATCH_SIZE} \
+  --train-iters ${TRAIN_STEPS} \
+  --tokenizer-type Llama2Tokenizer \
+  --tokenizer-model ${TOKENIZER_MODEL} \
+  --data-path ${DATA_PATH} \
+  --split 949,50,1 \
+  --lr ${LR} \
+  --min-lr ${MIN_LR} \
+  --lr-decay-style cosine \
+  --lr-warmup-iters ${LR_WARMUP_STEPS} \
+  --lr-decay-iters ${LR_DECAY_STEPS} \
+  --weight-decay ${WEIGHT_DECAY} \
+  --grad-clip-norm ${GRAD_CLIP} \
+  --optimizer adam \
+  --adam-beta1 0.9 \
+  --adam-beta2 0.95 \
+  --save-interval 500 \
+  --eval-interval 100 \
+  --eval-iters 10 \
+  --bf16 \
+  --mixed-precision \
+  --base-model ${CHECKPOINT_DIR} \
+  --save ${CHECKPOINT_SAVE_DIR} \
+  --load ${CHECKPOINT_SAVE_DIR} \
+  --low-cpu-fsdp \
+  --sharding-strategy FULL_SHARD \
+  --checkpoint-type LOCAL_STATE_DICT \
+  --fsdp-activation-checkpointing \
+  --use-mpi \
   --wandb-entity "prj-jalm" \
   --wandb-project "mistral-7b" \
-  --wandb_name "instruct-gpt-4-mistral-7b"
+  --wandb-name "kotoba-recipes-test"

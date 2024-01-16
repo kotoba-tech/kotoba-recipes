@@ -176,7 +176,7 @@ def _add_training_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
     # interval
     group.add_argument("--eval-interval", type=int, default=100)
     group.add_argument("--save-interval", type=int, default=500)
-    group.add_argument("--eval-inters", type=int, default=10)
+    group.add_argument("--eval-iters", type=int, default=10)
 
     # optimizer
     group.add_argument(

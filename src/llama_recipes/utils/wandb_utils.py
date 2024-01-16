@@ -27,16 +27,15 @@ def log_model_info(model: torch.nn.Module) -> None:
 
 
 def log_wandb(
-    batch: dict[str, torch.Tensor],
+    real_batch_size: int,
+    real_seq_len: int,
     model: torch.nn.Module,
     accumulation_loss: float,
     optimizer: torch.optim.Optimizer,
-    epoch: int,
-    step: int,
+    iteration: int,
     gradient_accumulation_steps: int,
     world_size: int,
     iteration_start_time: float,
-    wandb_iteration: int,
 ) -> None:
     wandb_stats: dict[str, Any] = {}
 
@@ -44,15 +43,14 @@ def log_wandb(
     wandb_stats["training/loss"] = accumulation_loss
     wandb_stats["training/perplexity"] = math.exp(accumulation_loss)
     # utils info
-    batch_size: int = batch["input_ids"].shape[0]
-    sequence_length: int = batch["input_ids"].shape[1]
+    batch_size: int = real_batch_size
+    sequence_length: int = real_seq_len
 
     wandb_stats["utils/batch_size"] = batch_size
     wandb_stats["utils/global_batch_size"] = batch_size * world_size * gradient_accumulation_steps
     wandb_stats["utils/seq_len"] = sequence_length
     wandb_stats["utils/gradient_accumulation_steps"] = gradient_accumulation_steps
-    wandb_stats["utils/epoch"] = epoch
-    wandb_stats["utils/step"] = step
+    wandb_stats["utils/iteration"] = iteration
 
     # optimizer info
     wandb_stats["optimizer/lr"] = optimizer.param_groups[0]["lr"]
@@ -149,10 +147,10 @@ def log_wandb(
     tflops: float = flops_per_iteration / (iteration_elapsed_time * (10**12))
     wandb_stats["stats/tflops"] = tflops
 
-    wandb.log(wandb_stats, step=wandb_iteration + 1)
+    wandb.log(wandb_stats, step=iteration)
 
     print("------------------------------------------------------------------")
-    print(f"iteration: {wandb_iteration + 1} , tflops: {tflops}, loss: {accumulation_loss}")
+    print(f"iteration: {iteration} , tflops: {tflops}, loss: {accumulation_loss}")
     print(
         "------------------------------------------------------------------",
         flush=True,

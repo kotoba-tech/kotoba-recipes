@@ -90,7 +90,6 @@ def save_rng_state(path: str) -> None:
 def save_checkpoint(
     model: FSDP,
     optimizer: torch.optim.Optimizer,
-    sampler: torch.utils.data.distributed.DistributedSampler,
     scheduler: torch.optim.lr_scheduler.LRScheduler,
     path: str,
     iteration: int,
@@ -115,10 +114,6 @@ def save_checkpoint(
     save_scheduler_state_dict(
         scheduler=scheduler,
         path=f"{checkpoint_path}/scheduler.pt",
-    )
-    save_sampler_state_dict(
-        sampler=sampler,
-        path=f"{checkpoint_path}/sampler.pt",
     )
     save_rng_state(
         path=f"{checkpoint_path}/rng.pt",

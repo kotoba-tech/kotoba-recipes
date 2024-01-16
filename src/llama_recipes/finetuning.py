@@ -34,6 +34,7 @@ from llama_recipes.utils.checkpoint import (
     load_optimizer_state_dict,
     load_scheduler_state_dict,
     load_rng_state_dict,
+    get_latest_iteration,
 )
 
 from llama_recipes.arguments import parse_args
@@ -83,6 +84,9 @@ def main() -> None:
         torch.cuda.set_device(get_local_rank())  # type: ignore
         clear_gpu_cache(get_local_rank())  # type: ignore
         setup_environ_flags(get_rank())  # type: ignore
+
+    iteration: int = get_latest_iteration(args.load)
+    args.iteration = iteration
 
     # random seed
     if args.load:
