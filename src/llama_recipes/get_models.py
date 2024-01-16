@@ -68,29 +68,16 @@ def get_model(
         mistral_max_length: int = 4096
         sliding_window: int = 4096
 
-        if is_rank_0():
-            model = MistralForCausalLM.from_pretrained(
-                model_name,
-                load_in_8bit=True if args.quantization else None,
-                device_map="auto" if args.quantization else None,
-                use_cache=use_cache,
-                sliding_window=sliding_window,
-                max_position_embeddings=mistral_max_length,
-                attn_implementation="flash_attention_2",
-                torch_dtype=torch.bfloat16 if args.bf16 else torch.float16,
-            )
-        else:
-            mistral_config = MistralConfig.from_pretrained(
-                model_name,
-            )
-            mistral_config.use_cache = use_cache
-            if args.bf16:
-                mistral_config.torch_dtype = torch.bfloat16
-            mistral_config.sliding_window = sliding_window
-            mistral_config.max_position_embeddings = mistral_max_length
-            mistral_config.attn_implementation = "flash_attention_2"
-            with torch.device("meta"):
-                model = MistralForCausalLM(mistral_config)
+        model = MistralForCausalLM.from_pretrained(
+            model_name,
+            load_in_8bit=True if args.quantization else None,
+            device_map="auto" if args.quantization else None,
+            use_cache=use_cache,
+            sliding_window=sliding_window,
+            max_position_embeddings=mistral_max_length,
+            attn_implementation="flash_attention_2",
+            torch_dtype=torch.bfloat16 if args.bf16 else torch.float16,
+        )
 
         return model  # type: ignore
 

@@ -1,8 +1,8 @@
 #!/bin/bash
-#$ -l rt_AF=4
+#$ -l rt_AF=16
 #$ -l h_rt=0:9:00:00
 #$ -j y
-#$ -o outputs/mistral-7b/okazaki-cc/
+#$ -o outputs/mistral-7b-ve/okazaki-cc/
 #$ -cwd
 
 # module load
@@ -60,18 +60,22 @@ WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
 # checkpoint & tokenizer
-TOKENIZER_MODEL=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1/tokenizer.model
-CHECKPOINT_DIR=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1
-CHECKPOINT_SAVE_DIR=/groups/gaf51275/llama/checkpoints/mistral-7b/test
+TOKENIZER_MODEL=
+CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
+CHECKPOINT_SAVE_DIR=/groups/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
 # data config
-DATASET_DIR=/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/tokenized/mistral
+DATASET_DIR=
 
 DATA_PATH=""
 
 DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/val_ja_wiki_text_document"
+
+
+# job name
+JOB_NAME="Mistral-7b-VE-okazaki-lab-cc-${NODE_TYPE}-${NUM_NODES}node-${NUM_GPUS}gpu-${SEQ_LENGTH}s-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}-WARMUP=${LR_WARMUP_STEPS}-WD=${WEIGHT_DECAY}-GC=${GRAD_CLIP}"
 
 # run
 mpirun -np $NUM_GPUS \
@@ -114,5 +118,5 @@ mpirun -np $NUM_GPUS \
   --fsdp-activation-checkpointing \
   --use-mpi \
   --wandb-entity "prj-jalm" \
-  --wandb-project "mistral-7b" \
-  --wandb-name "kotoba-recipes-test"
+  --wandb-project "abci-mistral-7b" \
+  --wandb-name "${JOB_NAME}"

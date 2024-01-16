@@ -79,7 +79,6 @@ def train(
 
         model.train()
         total_loss: float = 0.0
-        accumulation_loss: float = 0.0
 
         for _ in range(gradient_accumulation_steps):
 
@@ -104,7 +103,6 @@ def train(
                 loss.backward()
 
             total_loss += loss.item()
-            accumulation_loss += loss.item()
 
             # gradient clipping
             if args.grad_clip_norm > 0:
@@ -115,13 +113,16 @@ def train(
         # gradient accumulation end
         iteration += 1
         if args.fp16:
-            scaler.step(optimizer)  # type: ignore (suppress ubound error)
-            scaler.update()  # type: ignore (suppress ubound error)
+            scaler.step(optimizer)  # type: ignore (= optimizer.step())
+            scaler.update()  # type: ignore
+        elif args.bf16:
+            optimizer.step()
+
         optimizer.zero_grad()
         lr_scheduler.step()
 
         if args.wandb_name:
-            avg_loss = torch.tensor(accumulation_loss).to(local_rank)  # type: ignore
+            avg_loss = torch.tensor(total_loss).to(local_rank)  # type: ignore
             torch_distributed.all_reduce(tensor=avg_loss, op=torch_distributed.ReduceOp.SUM)
             avg_loss = avg_loss / world_size
 
@@ -137,7 +138,7 @@ def train(
                     world_size=world_size,
                     iteration_start_time=iteration_start_time,
                 )
-            accumulation_loss = 0.0
+            total_loss = 0.0
             iteration_start_time = time.perf_counter()
 
         if (iteration) % args.eval_interval == 0:
