@@ -73,7 +73,6 @@ DATA_PATH=""
 
 DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/val_ja_wiki_text_document"
 DATA_PATH="${DATA_PATH} 2493597126 ${DATASET_DIR}/train_ja_wiki_text_document"
-DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/en_books_text_document"
 
 # run
 mpirun -np $NUM_GPUS \
@@ -102,8 +101,8 @@ mpirun -np $NUM_GPUS \
   --optimizer adam \
   --adam-beta1 0.9 \
   --adam-beta2 0.95 \
-  --save-interval 20 \
-  --eval-interval 10 \
+  --save-interval 500 \
+  --eval-interval 100 \
   --eval-iters 10 \
   --bf16 \
   --mixed-precision \
@@ -117,4 +116,4 @@ mpirun -np $NUM_GPUS \
   --use-mpi \
   --wandb-entity "prj-jalm" \
   --wandb-project "mistral-7b" \
-  --wandb-name "kotoba-recipes-test"
+  --wandb-name "kotoba-recipes-logn-test"
