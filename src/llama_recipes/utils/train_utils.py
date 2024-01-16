@@ -15,7 +15,7 @@ from llama_recipes.utils.checkpoint import save_checkpoint, get_latest_iteration
 
 from typing import Optional, Any
 import wandb
-from megatron_lm.megatron.global_vars import get_args, get_tokenizer
+from megatron_lm.megatron.global_vars import get_args
 
 
 def train(
@@ -62,7 +62,7 @@ def train(
         iteration = get_latest_iteration(args.load)
 
     real_batch_size: int = args.micro_batch_size
-    real_seq_len: int = args.seq_len
+    real_seq_len: int = args.seq_length
 
     while iteration < args.train_iters:
         iteration_start_time = time.perf_counter()
@@ -242,7 +242,7 @@ def cleanup() -> None:
 
 def clear_gpu_cache(rank: Optional[int] = None) -> None:
     """Clear the GPU cache for all ranks"""
-    if rank == 0:
+    if torch_distributed.get_rank() == 0:
         print("Clearing GPU cache for all ranks")
     torch.cuda.empty_cache()
 

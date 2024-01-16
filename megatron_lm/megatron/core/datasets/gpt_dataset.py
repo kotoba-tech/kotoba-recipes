@@ -10,10 +10,10 @@ import typing
 import numpy
 import torch
 
-from megatron.core.datasets.blended_megatron_dataset_config import BlendedMegatronDatasetConfig
-from megatron.core.datasets.indexed_dataset import MMapIndexedDataset
-from megatron.core.datasets.megatron_dataset import MegatronDataset
-from megatron.core.datasets.utils import Split, log_single_rank
+from megatron_lm.megatron.core.datasets.blended_megatron_dataset_config import BlendedMegatronDatasetConfig
+from megatron_lm.megatron.core.datasets.indexed_dataset import MMapIndexedDataset
+from megatron_lm.megatron.core.datasets.megatron_dataset import MegatronDataset
+from megatron_lm.megatron.core.datasets.utils import Split, log_single_rank
 
 logger = logging.getLogger(__name__)
 
@@ -319,7 +319,7 @@ class GPTDataset(MegatronDataset):
                 f"\tBuild and save the sample index to {os.path.basename(path_to_sample_index)}",
             )
             t_beg = time.time()
-            from megatron.core.datasets import helpers
+            from megatron_lm.megatron.core.datasets import helpers
 
             assert document_index.dtype == numpy.int32
             assert self.indexed_dataset.sequence_lengths.dtype == numpy.int32

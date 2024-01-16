@@ -9,9 +9,9 @@ from typing import Dict, List
 import numpy
 import torch
 
-from megatron.core.datasets.blended_megatron_dataset_config import BlendedMegatronDatasetConfig
-from megatron.core.datasets.indexed_dataset import MMapIndexedDataset
-from megatron.core.datasets.utils import Split
+from megatron_lm.megatron.core.datasets.blended_megatron_dataset_config import BlendedMegatronDatasetConfig
+from megatron_lm.megatron.core.datasets.indexed_dataset import MMapIndexedDataset
+from megatron_lm.megatron.core.datasets.utils import Split
 
 
 class MegatronDataset(ABC, torch.utils.data.Dataset):

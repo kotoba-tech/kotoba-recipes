@@ -5,8 +5,8 @@
 import argparse
 import typing
 
-from megatron.tokenizer import build_tokenizer
-from megatron.tokenizer.tokenizer import _SentencePieceTokenizer
+from megatron_lm.megatron.tokenizer import build_tokenizer
+from megatron_lm.megatron.tokenizer.tokenizer import _SentencePieceTokenizer
 
 _GLOBAL_ARGS = None
 _GLOBAL_TOKENIZER = None

@@ -6,7 +6,6 @@ import os
 current_path: str = os.getcwd()
 sys.path.append(f"{current_path}/src")
 sys.path.append(current_path)
-sys.path.append(f"{current_path}/megatron_lm")
 
 from llama_recipes.finetuning import main
 

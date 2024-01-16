@@ -71,7 +71,7 @@ GRAD_CLIP=1
 
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1/tokenizer.model
-CHECKPOINT_DIR=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mixtral-8x7B-v0.1
+CHECKPOINT_DIR=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1
 CHECKPOINT_SAVE_DIR=/groups/gaf51275/llama/checkpoints/mistral-7b/test
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
@@ -81,7 +81,7 @@ DATASET_DIR=/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/tokenize
 
 DATA_PATH=""
 
-DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/val_ja_wiki"
+DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/val_ja_wiki_text_document"
 
 # run
 mpirun -np $NUM_GPUS \

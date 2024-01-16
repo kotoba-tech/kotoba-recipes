@@ -14,7 +14,6 @@ def log_model_info(model: torch.nn.Module) -> None:
     model_config["max_position_embeddings"] = model.config.max_position_embeddings
     model_config["num_attention_heads"] = model.config.num_attention_heads
     model_config["num_hidden_layers"] = model.config.num_hidden_layers
-    model_config["vocab_size"] = model.config.vocab_size
     model_config["model_architecture"] = model.config.architectures[0]
 
     print(f"model info: {model}")

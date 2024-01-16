@@ -5,10 +5,10 @@
 import numpy as np
 import torch
 
-from megatron.global_vars import (
+from megatron_lm.megatron.global_vars import (
     get_tokenizer,
 )
-from megatron.data.dataset_utils import (
+from megatron_lm.megatron.data.dataset_utils import (
     get_samples_mapping,
     get_a_and_b_segments,
     truncate_segments,

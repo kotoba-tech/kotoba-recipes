@@ -11,9 +11,9 @@ from typing import Union
 from torch.utils.data import Dataset
 import torch.distributed as torch_distributed
 
-from megatron.global_vars import get_args
-from megatron.core.datasets.blended_dataset import BlendedDataset
-from megatron.core.datasets.megatron_dataset import MegatronDataset
+from megatron_lm.megatron.global_vars import get_args
+from megatron_lm.megatron.core.datasets.blended_dataset import BlendedDataset
+from megatron_lm.megatron.core.datasets.megatron_dataset import MegatronDataset
 
 
 def build_pretraining_data_loader(

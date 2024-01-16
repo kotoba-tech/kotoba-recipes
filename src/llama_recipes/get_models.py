@@ -77,14 +77,14 @@ def get_model(
                 sliding_window=sliding_window,
                 max_position_embeddings=mistral_max_length,
                 attn_implementation="flash_attention_2",
-                torch_dtype=torch.bfloat16 if args.use_bf16 else torch.float16,
+                torch_dtype=torch.bfloat16 if args.bf16 else torch.float16,
             )
         else:
             mistral_config = MistralConfig.from_pretrained(
                 model_name,
             )
             mistral_config.use_cache = use_cache
-            if args.use_bf16:
+            if args.bf16:
                 mistral_config.torch_dtype = torch.bfloat16
             mistral_config.sliding_window = sliding_window
             mistral_config.max_position_embeddings = mistral_max_length
@@ -95,26 +95,14 @@ def get_model(
         return model  # type: ignore
 
     elif "Mixtral" in model_name:
-        if is_rank_0():
-            model = MixtralForCausalLM.from_pretrained(
-                model_name,
-                device_map="auto",
-                attn_implementation="flash_attention_2",
-                max_position_embeddings=4096,
-                torch_dtype=torch.bfloat16 if args.use_bf16 else torch.float16,
-            )
-        else:
-            mixtral_config = MixtralConfig.from_pretrained(
-                model_name
-            )
-            mixtral_config.use_cache = use_cache
-            if args.use_bf16:
-                mixtral_config.torch_dtype = torch.bfloat16
-            mixtral_config.max_position_embeddings = 4096
-            mixtral_config.attn_implementation = "flash_attention_2"
 
-            with torch.device("meta"):
-                model = MixtralForCausalLM(mixtral_config)
+        model = MixtralForCausalLM.from_pretrained(
+            model_name,
+            device_map="auto",
+            attn_implementation="flash_attention_2",
+            max_position_embeddings=4096,
+            torch_dtype=torch.bfloat16 if args.bf16 else torch.float16,
+        )
 
         return model  # type: ignore
 

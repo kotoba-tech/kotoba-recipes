@@ -7,11 +7,11 @@ from typing import Any, Callable, List, Optional, Tuple, Type, Union
 import numpy
 import torch
 
-from megatron.core.datasets.blended_dataset import BlendedDataset
-from megatron.core.datasets.blended_megatron_dataset_config import BlendedMegatronDatasetConfig
-from megatron.core.datasets.indexed_dataset import MMapIndexedDataset
-from megatron.core.datasets.megatron_dataset import MegatronDataset
-from megatron.core.datasets.utils import Split, normalize
+from megatron_lm.megatron.core.datasets.blended_dataset import BlendedDataset
+from megatron_lm.megatron.core.datasets.blended_megatron_dataset_config import BlendedMegatronDatasetConfig
+from megatron_lm.megatron.core.datasets.indexed_dataset import MMapIndexedDataset
+from megatron_lm.megatron.core.datasets.megatron_dataset import MegatronDataset
+from megatron_lm.megatron.core.datasets.utils import Split, normalize
 
 logger = logging.getLogger(__name__)
 

@@ -23,8 +23,8 @@ try:
 except ImportError:
     nltk_available = False
 
-from megatron.tokenizer import build_tokenizer
-from megatron.core.datasets import indexed_dataset
+from megatron_lm.megatron.tokenizer import build_tokenizer
+from megatron_lm.megatron.core.datasets import indexed_dataset
 
 
 # https://stackoverflow.com/questions/33139531/preserve-empty-lines-with-nltks-punkt-tokenizer

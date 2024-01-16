@@ -8,7 +8,7 @@ from typing import Callable, List, Optional, Tuple
 
 import torch
 
-from megatron.core.datasets.utils import Split, log_single_rank, normalize
+from megatron_lm.megatron.core.datasets.utils import Split, log_single_rank, normalize
 
 logger = logging.getLogger(__name__)
 

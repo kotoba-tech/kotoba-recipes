@@ -153,6 +153,10 @@ def main() -> None:
 
     train_dataset, validation_dataset, test_dataset = build_train_valid_test_datasets()
 
+    args.consumed_train_samples = args.global_batch_size * args.iteration
+    args.consumed_valid_samples = args.global_batch_size * (
+        args.iteration // args.eval_interval) * args.eval_iters
+
     train_dataloader = build_pretraining_data_loader(
         dataset=train_dataset,
         consumed_samples=args.consumed_train_samples,

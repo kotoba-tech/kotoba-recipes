@@ -28,11 +28,11 @@ import numpy as np
 import torch
 import torch.distributed as torch_distributed
 
-from megatron.global_vars import (
+from megatron_lm.megatron.global_vars import (
     get_args,
 )
 from llama_recipes.utils.distributed import print_rank_0
-from megatron.core.datasets.indexed_dataset import MMapIndexedDataset
+from megatron_lm.megatron.core.datasets.indexed_dataset import MMapIndexedDataset
 
 
 DSET_TYPE_BERT = 'standard_bert'
@@ -543,7 +543,7 @@ def build_dataset(
     indexed_dataset=None
 ):
 
-    from megatron.data.bert_dataset import BertDataset
+    from megatron_lm.megatron.data.bert_dataset import BertDataset
 
     if dataset_type not in DSET_TYPES:
         raise ValueError("Invalid dataset_type: ", dataset_type)
@@ -667,7 +667,7 @@ def get_samples_mapping(indexed_dataset,
         print_rank_0(' > building samples index mapping for {} ...'.format(
             name))
         # First compile and then import.
-        from megatron.core.datasets import helpers
+        from megatron_lm.megatron.core.datasets import helpers
         samples_mapping = helpers.build_mapping(
             indexed_dataset.document_indices,
             indexed_dataset.sequence_lengths,
