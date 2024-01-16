@@ -149,7 +149,7 @@ def log_wandb(
     wandb.log(wandb_stats, step=iteration)
 
     print("------------------------------------------------------------------")
-    print(f"iteration: {iteration} , tflops: {tflops}, loss: {accumulation_loss}")
+    print(f"iteration: {iteration} , TFLOPS: {tflops}, Loss: {accumulation_loss}")
     print(
         "------------------------------------------------------------------",
         flush=True,

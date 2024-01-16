@@ -114,7 +114,7 @@ class GPTDataset(MegatronDataset):
         )
 
         return {
-            "tokens": tokens,
+            "input_ids": tokens,
             "labels": labels,
             "attention_mask": attention_mask,
             "loss_mask": loss_mask,

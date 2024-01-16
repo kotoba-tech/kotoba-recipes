@@ -18,6 +18,12 @@ import wandb
 from megatron_lm.megatron.global_vars import get_args
 
 
+def cyclic_iter(iter):
+    while True:
+        for x in iter:
+            yield x
+
+
 def train(
     model,
     train_dataloader,
@@ -64,6 +70,10 @@ def train(
     real_batch_size: int = args.micro_batch_size
     real_seq_len: int = args.seq_length
 
+    # cyclic iter
+    train_dataloader = iter(cyclic_iter(train_dataloader))
+    eval_dataloader = iter(cyclic_iter(eval_dataloader))
+
     while iteration < args.train_iters:
         iteration_start_time = time.perf_counter()
 
@@ -74,6 +84,11 @@ def train(
         for _ in range(gradient_accumulation_steps):
 
             batch = next(train_dataloader)
+            del batch["dataset_id"]
+            del batch["attention_mask"]
+            batch["attention_mask"] = batch["loss_mask"]
+            del batch["loss_mask"]
+
             for key in batch.keys():
                 batch[key] = batch[key].to(local_rank)
 
