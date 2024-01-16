@@ -218,10 +218,12 @@ class GPTDataset(MegatronDataset):
         path_to_cache = self.config.path_to_cache
         if path_to_cache is None:
             path_to_cache = os.path.join(
-                self.indexed_dataset.path_prefix, "cache", f"{type(self).__name__}_indices"
+                self.indexed_dataset.path_prefix,  # type: ignore
+                "cache",
+                f"{type(self).__name__}_indices"
             )
 
-        get_path_to = lambda suffix: os.path.join(
+        get_path_to = lambda suffix: os.path.join(  # noqa: E731
             path_to_cache, f"{self.unique_description_hash}-{type(self).__name__}-{suffix}"
         )
         path_to_description = get_path_to("description.txt")
@@ -341,7 +343,9 @@ class GPTDataset(MegatronDataset):
             t_beg = time.time()
             if separate_final_epoch:
                 shuffle_index = _build_shuffle_index(
-                    num_samples_sans_final_epoch, sample_index.shape[0] - 1, numpy_random_state
+                    num_samples_sans_final_epoch,  # type: ignore
+                    sample_index.shape[0] - 1,
+                    numpy_random_state
                 )
             else:
                 shuffle_index = _build_shuffle_index(
@@ -545,7 +549,7 @@ def _get_ltor_masks_and_position_ids(
     if reset_position_ids or reset_attention_mask:
 
         # Find indecies where EOD token is.
-        eod_index = position_ids[data[b] == eod_token]
+        eod_index = position_ids[data[-1] == eod_token]
         # Detach indecies from positions if going to modify positions.
         if reset_position_ids:
             eod_index = eod_index.clone()

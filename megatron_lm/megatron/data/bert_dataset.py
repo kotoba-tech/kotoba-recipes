@@ -5,7 +5,7 @@
 import numpy as np
 import torch
 
-from megatron import (
+from megatron.global_vars import (
     get_tokenizer,
 )
 from megatron.data.dataset_utils import (
@@ -38,7 +38,7 @@ class BertDataset(torch.utils.data.Dataset):
                                                    data_prefix,
                                                    num_epochs,
                                                    max_num_samples,
-                                                   self.max_seq_length - 3, # account for added tokens
+                                                   self.max_seq_length - 3,  # account for added tokens
                                                    short_seq_prob,
                                                    self.seed,
                                                    self.name,

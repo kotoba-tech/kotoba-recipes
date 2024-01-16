@@ -46,7 +46,7 @@ class BlendedDataset(torch.utils.data.Dataset):
         assert len(datasets) < 32767
         assert len(datasets) == len(weights)
         assert numpy.isclose(sum(weights), 1.0)
-        assert all(map(lambda _: type(_) == type(datasets[0]), datasets))
+        assert all(map(lambda _: type(_) == type(datasets[0]), datasets))  # type: ignore # noqa:
 
         # Alert user to unnecessary blending
         if len(datasets) == 1:
@@ -91,7 +91,7 @@ class BlendedDataset(torch.utils.data.Dataset):
         dataset_sample_id = self.dataset_sample_index[idx]
         return {
             "dataset_id": dataset_id,
-            **self.datasets[dataset_id][dataset_sample_id],
+            **self.datasets[dataset_id][dataset_sample_id],  # type: ignore
         }
 
     def _build_indices(self) -> Tuple[numpy.ndarray, numpy.ndarray]:
@@ -107,7 +107,7 @@ class BlendedDataset(torch.utils.data.Dataset):
         path_to_cache = self.config.path_to_cache
 
         if path_to_cache:
-            get_path_to = lambda suffix: os.path.join(
+            get_path_to = lambda suffix: os.path.join(  # noqa
                 path_to_cache, f"{self.unique_description_hash}-{type(self).__name__}-{suffix}"
             )
             path_to_description = get_path_to("description.txt")
@@ -129,7 +129,7 @@ class BlendedDataset(torch.utils.data.Dataset):
 
             # Build the dataset and dataset sample indexes
             log_single_rank(
-                logger, logging.INFO, f"\tBuild and save the dataset and dataset sample indexes"
+                logger, logging.INFO, "\tBuild and save the dataset and dataset sample indexes"
             )
             t_beg = time.time()
             from megatron.core.datasets import helpers
@@ -148,11 +148,11 @@ class BlendedDataset(torch.utils.data.Dataset):
             if path_to_cache:
                 os.makedirs(path_to_cache, exist_ok=True)
                 # Write the description
-                with open(path_to_description, "wt") as writer:
+                with open(path_to_description, "wt") as writer:  # type: ignore
                     writer.write(self.unique_description)
                 # Save the indexes
-                numpy.save(path_to_dataset_index, dataset_index, allow_pickle=True)
-                numpy.save(path_to_dataset_sample_index, dataset_sample_index, allow_pickle=True)
+                numpy.save(path_to_dataset_index, dataset_index, allow_pickle=True)  # type: ignore
+                numpy.save(path_to_dataset_sample_index, dataset_sample_index, allow_pickle=True)  # type: ignore
             else:
                 log_single_rank(
                     logger,
@@ -168,21 +168,21 @@ class BlendedDataset(torch.utils.data.Dataset):
         log_single_rank(logger, logging.INFO, f"Load the {type(self).__name__} indices")
 
         log_single_rank(
-            logger, logging.INFO, f"\tLoad the dataset index from {path_to_dataset_index}"
+            logger, logging.INFO, f"\tLoad the dataset index from {path_to_dataset_index}"  # type: ignore
         )
         t_beg = time.time()
-        dataset_index = numpy.load(path_to_dataset_index, allow_pickle=True, mmap_mode='r')
+        dataset_index = numpy.load(path_to_dataset_index, allow_pickle=True, mmap_mode='r')  # type: ignore
         t_end = time.time()
         log_single_rank(logger, logging.DEBUG, f"\t> time elapsed: {t_end - t_beg:4f} seconds")
 
         log_single_rank(
             logger,
             logging.INFO,
-            f"\tLoad the dataset sample index from {path_to_dataset_sample_index}",
+            f"\tLoad the dataset sample index from {path_to_dataset_sample_index}",  # type: ignore
         )
         t_beg = time.time()
         dataset_sample_index = numpy.load(
-            path_to_dataset_sample_index, allow_pickle=True, mmap_mode='r'
+            path_to_dataset_sample_index, allow_pickle=True, mmap_mode='r'  # type: ignore
         )
         t_end = time.time()
         log_single_rank(logger, logging.DEBUG, f"\t> time elapsed: {t_end - t_beg:4f} seconds")

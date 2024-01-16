@@ -1,54 +1,9 @@
-from llama_recipes.configs import train_config
 import torch
 import wandb
 import os
 import time
 import math
 from typing import Any
-
-
-def set_config(wandb_configs: dict) -> None:
-    # train_config
-    wandb_configs["model_name"] = train_config.model_name
-    wandb_configs["enable_fsdp"] = train_config.enable_fsdp
-    wandb_configs["low_cpu_fsdp"] = train_config.low_cpu_fsdp
-    wandb_configs["run_validation"] = train_config.run_validation
-    wandb_configs["batch_size"] = train_config.batch_size
-    wandb_configs["gradient_accumulation_steps"] = train_config.gradient_accumulation_steps
-    wandb_configs["num_epochs"] = train_config.num_epochs
-    wandb_configs["num_workers_dataloader"] = train_config.num_workers_dataloader
-    wandb_configs["lr"] = train_config.lr
-    wandb_configs["lr_min"] = train_config.lr_min
-    wandb_configs["lr_decay"] = train_config.lr_decay
-    wandb_configs["lr_warmup"] = train_config.lr_warmup
-    wandb_configs["lr_decay_style"] = train_config.lr_decay_style
-    wandb_configs["use_sequence_length_schedule"] = train_config.use_sequence_length_schedule
-    wandb_configs["weight_decay"] = train_config.weight_decay
-    wandb_configs["gamma"] = train_config.gamma
-    wandb_configs["adamw_eps"] = train_config.adamw_eps
-    wandb_configs["adamw_betas"] = train_config.adamw_betas
-    wandb_configs["seed"] = train_config.seed
-    wandb_configs["use_bf16"] = train_config.use_bf16
-    wandb_configs["use_fp16"] = train_config.use_fp16
-    wandb_configs["mixed_precision"] = train_config.mixed_precision
-    wandb_configs["dataset"] = train_config.dataset
-    wandb_configs["peft_method"] = train_config.peft_method
-    wandb_configs["use_peft"] = train_config.use_peft
-    wandb_configs["freeze_layers"] = train_config.freeze_layers
-    wandb_configs["num_freeze_layers"] = train_config.num_freeze_layers
-    wandb_configs["quantization"] = train_config.quantization
-    wandb_configs["one_gpu"] = train_config.one_gpu
-    wandb_configs["save_model"] = train_config.save_model
-    wandb_configs["save_optimizer"] = train_config.save_optimizer
-    wandb_configs["use_fast_kernels"] = train_config.use_fast_kernels
-    wandb_configs["use_mpi"] = train_config.use_mpi
-
-    # fsdp_config
-    wandb_configs["sharding_strategy"] = train_config.sharding_strategy
-    wandb_configs["checkpoint_type"] = train_config.checkpoint_type
-    wandb_configs["fsdp_activation_checkpointing"] = train_config.fsdp_activation_checkpointing
-    wandb_configs["optimizer"] = train_config.optimizer
-    wandb_configs["fsdp_cpu_offload"] = train_config.fsdp_cpu_offload
 
 
 def log_model_info(model: torch.nn.Module) -> None:
@@ -166,7 +121,10 @@ def log_wandb(
     wandb_stats["stats/tokens_per_sec_per_gpu"] = tokens_per_sec / world_size
 
     checkpoint_activations_factor = 3
-    if train_config is not None and train_config.fsdp_activation_checkpointing:  # type ignore
+    from megatron_lm.megatron.global_vars import get_args
+
+    args = get_args()
+    if args.fsdp_activation_checkpointing:  # type ignore
         checkpoint_activations_factor = 4
 
     num_layers: int = model.config.num_hidden_layers
