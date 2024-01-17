@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -l rt_AF=4
+#$ -l rt_AF=16
 #$ -l h_rt=10:0:00:00
 #$ -j y
 #$ -o outputs/mistral-7b-ve/okazaki-cc/
