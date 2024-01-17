@@ -62,7 +62,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/merged_tokenizer_sp/jalm_llama.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
-CHECKPOINT_SAVE_DIR=/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc-test
+CHECKPOINT_SAVE_DIR=/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
