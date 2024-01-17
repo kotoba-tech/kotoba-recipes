@@ -135,6 +135,10 @@ def _add_data_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         '--short-seq-prob', type=float, default=0.1,
         help='Probability of producing a short sequence.'
     )
+    group.add_argument(
+        '--vocab-extra-ids', type=int, default=0,
+        help='Number of additional vocabulary tokens. They are used for span masking in the T5 model'
+    )
 
     return parser
 

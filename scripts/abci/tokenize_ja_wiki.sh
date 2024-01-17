@@ -15,16 +15,16 @@ module load hpcx/2.12
 # swich virtual env
 source .env/bin/activate
 
-DATASET_DIR=/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/sample/ja_wiki
-OUTPUT_DIR=/bb/llm/gaf51275/llama/datasets/llama2-llm-jp-corpus/v1.0.2/tokenized/mistral
+DATASET_DIR=/bb/llm/gaf51275/llama/datasets/merge_datasets/ja_wiki
+OUTPUT_DIR=/bb/llm/gaf51275/llama/datasets/mistral-7b-ve/tokenized
 
 mkdir -p ${OUTPUT_DIR}
 
 # tokenize japanese wikipedia
 python megatron_lm/tools/preprocess_data.py \
-  --input ${DATASET_DIR}/merged_train_0.jsonl \
-  --output-prefix ${OUTPUT_DIR}/train_ja_wiki \
+  --input ${DATASET_DIR}/ja_wiki_merged.jsonl \
+  --output-prefix ${OUTPUT_DIR}/ja_wiki \
   --tokenizer-type Llama2Tokenizer \
-  --tokenizer-model /bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1/tokenizer.model \
+  --tokenizer-model /bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/merged_tokenizer_sp/jalm_llama.model \
   --append-eod \
   --workers 64

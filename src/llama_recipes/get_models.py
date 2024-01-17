@@ -61,7 +61,7 @@ def get_model(
 
         return model  # type: ignore
 
-    elif "Mistral" in model_name:
+    elif "Mistral" in model_name or "mistral" in model_name:
         # If using torch.device("meta"), FSDP training hang
         # FYI: https://github.com/iwiwi/epochraft-hf-fsdp/pull/10#issuecomment-1803360147
         # https://github.com/pytorch/pytorch/issues/105840 are maybe helpful

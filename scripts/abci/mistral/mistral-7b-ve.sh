@@ -52,8 +52,8 @@ GLOBAL_BATCH_SIZE=1024
 TRAIN_STEPS=25000
 
 # optimizer config
-LR=1e-4
-MIN_LR=3.3e-6
+LR=7e-5
+MIN_LR=2.3e-6
 LR_WARMUP_STEPS=1000
 LR_DECAY_STEPS=25000
 WEIGHT_DECAY=0.1
@@ -67,13 +67,23 @@ CHECKPOINT_SAVE_DIR=/groups/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
 # data config
-DATASET_DIR=/bb/llm/gaf51275/llama/datasets/mistral-7b-ve/tokenized
 
 DATA_PATH=""
 
-DATA_PATH="${DATA_PATH}  ${DATASET_DIR}/en_books_text_document"
-DATA_PATH="${DATA_PATH}  ${DATASET_DIR}/en_arxiv_text_document"
+# okazaki lab cc
+DATA_PATH="${DATA_PATH} 10602587419 /bb/llm/gaf51275/llama/datasets/mistral_16k-hf/okazaki_lab_cc_03_1500_split_0_text_document"
+DATA_PATH="${DATA_PATH} 10464291875 /bb/llm/gaf51275/llama/datasets/mistral_16k-hf/okazaki_lab_cc_03_1500_split_1_text_document"
+DATA_PATH="${DATA_PATH} 12464735530 /bb/llm/gaf51275/llama/datasets/mistral_16k-hf/okazaki_lab_cc_03_1500_split_2_text_document"
+DATA_PATH="${DATA_PATH} 16443879068 /bb/llm/gaf51275/llama/datasets/mistral_16k-hf/okazaki_lab_cc_03_1500_split_3_text_document"
+DATA_PATH="${DATA_PATH} 38355639490 /bb/llm/gaf51275/llama/datasets/mistral_16k-hf/okazaki_lab_cc_03_1500_split_4_text_document"
 
+# ja wikipedia
+DATA_PATH="${DATA_PATH} 1668866619 /bb/llm/gaf51275/llama/datasets/mistral_16k-hf/ja_wiki_merged_text_document"
+
+# en arxiv
+DATA_PATH="${DATA_PATH} 5000000000 /bb/llm/gaf51275/llama/datasets/mistral_16k-hf/arxiv_text_document"
+# refinedweb
+DATA_PATH="${DATA_PATH} 5000000000 /bb/llm/gaf51275/llama/datasets/mistral_16k-hf/falcon_text_document"
 
 # job name
 JOB_NAME="Mistral-7b-VE-okazaki-lab-cc-${NODE_TYPE}-${NUM_NODES}node-${NUM_GPUS}gpu-${SEQ_LENGTH}s-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}-WARMUP=${LR_WARMUP_STEPS}-WD=${WEIGHT_DECAY}-GC=${GRAD_CLIP}"
