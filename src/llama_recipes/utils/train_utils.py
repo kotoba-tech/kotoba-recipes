@@ -216,7 +216,7 @@ def evaluation(
             loss = outputs.loss
             eval_loss += loss.detach().float()
 
-        torch_distributed.all_reduce(eval_loss, op=torch_distributed.ReduceOp.SUM)
+    torch_distributed.all_reduce(eval_loss, op=torch_distributed.ReduceOp.SUM)
 
     # Compute average loss and perplexity
     eval_epoch_loss: float = eval_loss / args.eval_iters / world_size
