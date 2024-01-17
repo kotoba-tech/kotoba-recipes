@@ -87,6 +87,7 @@ def main() -> None:
 
     iteration: int = get_latest_iteration(args.load)
     args.iteration = iteration
+    torch.distributed.barrier()
 
     # random seed
     if args.load:

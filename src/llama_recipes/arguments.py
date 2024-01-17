@@ -223,7 +223,8 @@ def _add_training_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
     # batch size
     group.add_argument(
         '--global-batch-size', type=int, default=None,
-        help='Training batch size. If set, it should be a multiple of micro-batch-size times data-parallel-size. If this value is None, then use micro-batch-size * data-parallel-size as the '
+        help='Training batch size. If set, it should be a multiple of micro-batch-size times data-parallel-size'
+        'If this value is None, then use micro-batch-size * data-parallel-size as the '
         'global batch size. This choice will result in 1 for number of micro-batches.'
     )
     group.add_argument(
@@ -237,6 +238,9 @@ def _add_training_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
         '--make-vocab-size-divisible-by', type=int, default=128,
         help='Pad the vocab size to be divisible by this value.This is added for computational efficiency reasons.'
     )
+
+    # model
+    group.add_argument("--sliding-window-size", type=int, default=4096)
 
     return parser
 

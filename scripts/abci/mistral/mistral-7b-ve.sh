@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -l rt_AF=16
+#$ -l rt_AF=4
 #$ -l h_rt=10:0:00:00
 #$ -j y
 #$ -o outputs/mistral-7b-ve/okazaki-cc/
@@ -62,7 +62,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/merged_tokenizer_sp/jalm_llama.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
-CHECKPOINT_SAVE_DIR=/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc
+CHECKPOINT_SAVE_DIR=/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc-test
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -100,6 +100,7 @@ mpirun -np $NUM_GPUS \
   -x PATH \
   python examples/finetuning.py \
   --seq-length ${SEQ_LENGTH} \
+  --sliding-window-size ${SEQ_LENGTH} \
   --micro-batch-size ${MICRO_BATCH_SIZE} \
   --global-batch-size ${GLOBAL_BATCH_SIZE} \
   --train-iters ${TRAIN_STEPS} \

@@ -65,8 +65,10 @@ def get_model(
         # If using torch.device("meta"), FSDP training hang
         # FYI: https://github.com/iwiwi/epochraft-hf-fsdp/pull/10#issuecomment-1803360147
         # https://github.com/pytorch/pytorch/issues/105840 are maybe helpful
-        mistral_max_length: int = 4096
-        sliding_window: int = 4096
+        mistral_max_length: int = args.seq_length
+        sliding_window: int = args.sliding_window_size
+        assert mistral_max_length == 4096
+        assert sliding_window == 4096
 
         model = MistralForCausalLM.from_pretrained(
             model_name,

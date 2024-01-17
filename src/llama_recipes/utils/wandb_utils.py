@@ -118,11 +118,6 @@ def log_wandb(
     wandb_stats["stats/tokens_per_sec_per_gpu"] = tokens_per_sec / world_size
 
     checkpoint_activations_factor = 3
-    from megatron_lm.megatron.global_vars import get_args
-
-    args = get_args()
-    if args.fsdp_activation_checkpointing:  # type ignore
-        checkpoint_activations_factor = 4
 
     num_layers: int = model.config.num_hidden_layers
     hidden_size: int = model.config.hidden_size

@@ -63,10 +63,7 @@ def train(
     if rank == 0 and args.wandb_name:
         log_model_info(model)
 
-    iteration: int = 0
-    if args.load != "":
-        iteration = get_latest_iteration(args.load)
-
+    iteration: int = args.iteration
     real_batch_size: int = args.micro_batch_size
     real_seq_len: int = args.seq_length
 
@@ -122,7 +119,7 @@ def train(
         lr_scheduler.step()
 
         if args.wandb_name:
-            avg_loss = torch.tensor(total_loss).to(local_rank)  # type: ignore
+            avg_loss: torch.Tensor = torch.tensor(total_loss).to(local_rank)  # type: ignore
             torch_distributed.all_reduce(tensor=avg_loss, op=torch_distributed.ReduceOp.SUM)
             avg_loss = avg_loss / world_size
 
@@ -131,7 +128,7 @@ def train(
                     real_batch_size=real_batch_size,
                     real_seq_len=real_seq_len,
                     model=model,
-                    accumulation_loss=avg_loss,
+                    accumulation_loss=avg_loss,  # type: ignore
                     optimizer=optimizer,
                     iteration=iteration,
                     gradient_accumulation_steps=gradient_accumulation_steps,
