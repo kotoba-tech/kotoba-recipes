@@ -216,7 +216,6 @@ def evaluation(
             loss = outputs.loss
             eval_loss += loss.detach().float()
 
-    if torch.cuda.device_count() > 1 and not wandb_log:
         torch_distributed.all_reduce(eval_loss, op=torch_distributed.ReduceOp.SUM)
 
     # Compute average loss and perplexity
@@ -224,7 +223,7 @@ def evaluation(
     eval_ppl = torch.exp(eval_epoch_loss)  # type: ignore
 
     # Print evaluation metrics
-    if local_rank == 0:
+    if torch_distributed.get_rank() == 0:
         print(f" eval ppl={eval_ppl}, eval loss={eval_epoch_loss}")
 
     return eval_ppl, eval_epoch_loss
