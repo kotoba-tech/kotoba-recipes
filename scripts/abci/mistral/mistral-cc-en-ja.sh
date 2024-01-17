@@ -1,6 +1,6 @@
 #!/bin/bash
-#$ -l rt_AF=8
-#$ -l h_rt=0:7:00:00
+#$ -l rt_AF=16
+#$ -l h_rt=0:2:00:00
 #$ -j y
 #$ -o outputs/mistral-7b/okazaki-cc/
 #$ -cwd
@@ -62,7 +62,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1/tokenizer.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1
-CHECKPOINT_SAVE_DIR=/groups/gaf51275/llama/checkpoints/mistral-7b/long-test
+CHECKPOINT_SAVE_DIR=/groups/gaf51275/llama/checkpoints/mistral-7b/long-test-en-ja
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -73,6 +73,8 @@ DATA_PATH=""
 
 DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/val_ja_wiki_text_document"
 DATA_PATH="${DATA_PATH} 2493597126 ${DATASET_DIR}/train_ja_wiki_text_document"
+DATA_PATH="${DATA_PATH} 14314716279 ${DATASET_DIR}/en_arxiv_text_document"
+DATA_PATH="${DATA_PATH} 21571989805 ${DATASET_DIR}/en_books_text_document"
 
 # run
 mpirun -np $NUM_GPUS \

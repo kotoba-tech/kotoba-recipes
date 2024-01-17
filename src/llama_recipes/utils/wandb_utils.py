@@ -135,12 +135,17 @@ def log_wandb(
         activation_function_factor = 4 + 2  # SWiGLU (upscaling + down scaling)
 
     batch_size = batch_size * gradient_accumulation_steps
+    num_query_groups: int = model.config.num_attention_heads / model.config.num_key_value_heads
 
     # tflops calculation
     flops_per_iteration: float = checkpoint_activations_factor * ((
-        (8 + activation_function_factor * (intermediate_size / hidden_size)) * batch_size * sequence_length * num_layers * (hidden_size**2)  # noqa: E501
+        (2 + (2 * 3) + activation_function_factor * (intermediate_size / hidden_size)) * batch_size * sequence_length * num_layers * (hidden_size**2)
     ) + (
-        4 * batch_size * (sequence_length ** 2) * hidden_size +  # noqa: W504
+        ((  # Attention matrix & attention over values
+            4 * batch_size * (sequence_length ** 2) * hidden_size
+        ) / num_query_groups
+        ) +  # noqa: W504
+        # lm-head: logit layer
         2 * batch_size * sequence_length * hidden_size * vocab_size)
     )
     tflops: float = flops_per_iteration / (iteration_elapsed_time * (10**12))

@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -l rt_AF=16
-#$ -l h_rt=0:9:00:00
+#$ -l h_rt=10:0:00:00
 #$ -j y
 #$ -o outputs/mistral-7b-ve/okazaki-cc/
 #$ -cwd
@@ -60,18 +60,19 @@ WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
 # checkpoint & tokenizer
-TOKENIZER_MODEL=
+TOKENIZER_MODEL=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/merged_tokenizer_sp/jalm_llama.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
 CHECKPOINT_SAVE_DIR=/groups/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
 # data config
-DATASET_DIR=
+DATASET_DIR=/bb/llm/gaf51275/llama/datasets/mistral-7b-ve/tokenized
 
 DATA_PATH=""
 
-DATA_PATH="${DATA_PATH} 1722428 ${DATASET_DIR}/val_ja_wiki_text_document"
+DATA_PATH="${DATA_PATH}  ${DATASET_DIR}/en_books_text_document"
+DATA_PATH="${DATA_PATH}  ${DATASET_DIR}/en_arxiv_text_document"
 
 
 # job name
