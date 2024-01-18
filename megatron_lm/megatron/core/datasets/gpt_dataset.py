@@ -104,8 +104,9 @@ class GPTDataset(MegatronDataset):
         tokens = text.long()
         labels = tokens.clone()
 
-        # HF Transformers automatically shift input_ids and labels, so don't shift manually
-        # like, labels = tokens_[1:].contiguous().
+        # HF Transformers automatically shift input_ids and labels, so don't shift manually.
+        # ref: Mistral https://github.com/huggingface/transformers/blob/main/src/transformers/models/mistral/modeling_mistral.py#L1171-L1174
+        # ref: https://discuss.huggingface.co/t/where-does-the-transformers-do-the-target-text-shifting-in-causal-lm/32408/4
         # Also, if attention mask is all 1(= True), you don't have to pass attention mask.
         # HF Transformers' attention mask is 1 D. so like this. [1, 1, 1, ...., 0, 0]
         # 1 means token, 0 means pad_token.
