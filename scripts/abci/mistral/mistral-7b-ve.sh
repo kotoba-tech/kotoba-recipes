@@ -62,7 +62,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/merged_tokenizer_sp/jalm_llama.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
-CHECKPOINT_SAVE_DIR=/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc
+CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc-lr=${LR}-minlr=${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -118,6 +118,7 @@ mpirun -np $NUM_GPUS \
   --optimizer adam \
   --adam-beta1 0.9 \
   --adam-beta2 0.95 \
+  --adam-eps 1e-6 \
   --save-interval 500 \
   --eval-interval 100 \
   --eval-iters 10 \

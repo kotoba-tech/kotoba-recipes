@@ -90,7 +90,7 @@ class BlendedDataset(torch.utils.data.Dataset):
         dataset_id = self.dataset_index[idx]
         dataset_sample_id = self.dataset_sample_index[idx]
         return {
-            "dataset_id": dataset_id,
+            # "dataset_id": dataset_id,
             **self.datasets[dataset_id][dataset_sample_id],  # type: ignore
         }
 

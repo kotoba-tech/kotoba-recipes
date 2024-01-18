@@ -101,24 +101,17 @@ class GPTDataset(MegatronDataset):
 
         text = torch.from_numpy(text)
 
-        tokens_ = text.long()
-        labels = tokens_[1:].contiguous()
-        tokens = tokens_[:-1].contiguous()
+        tokens = text.long()
+        labels = tokens.clone()
 
-        attention_mask, loss_mask, position_ids = _get_ltor_masks_and_position_ids(
-            tokens,
-            self.config.eod_id,  # type: ignore
-            self.config.reset_position_ids,  # type: ignore
-            self.config.reset_attention_mask,  # type: ignore
-            self.config.eod_mask_loss,  # type: ignore
-        )
-
+        # HF Transformers automatically shift input_ids and labels, so don't shift manually
+        # like, labels = tokens_[1:].contiguous().
+        # Also, if attention mask is all 1(= True), you don't have to pass attention mask.
+        # HF Transformers' attention mask is 1 D. so like this. [1, 1, 1, ...., 0, 0]
+        # 1 means token, 0 means pad_token.
         return {
             "input_ids": tokens,
             "labels": labels,
-            "attention_mask": attention_mask,
-            "loss_mask": loss_mask,
-            "position_ids": position_ids,
         }
 
     @staticmethod

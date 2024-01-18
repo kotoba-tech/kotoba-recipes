@@ -15,7 +15,7 @@ from llama_recipes.utils.checkpoint import save_checkpoint, get_latest_iteration
 
 from typing import Optional, Any
 import wandb
-from megatron_lm.megatron.global_vars import get_args
+from megatron_lm.megatron.global_vars import get_args, get_tokenizer
 
 
 def cyclic_iter(iter):
@@ -100,10 +100,6 @@ def train(
         for _ in range(gradient_accumulation_steps):
 
             batch = next(train_dataloader)
-            del batch["dataset_id"]
-            del batch["attention_mask"]
-            batch["attention_mask"] = batch["loss_mask"]
-            del batch["loss_mask"]
 
             for key in batch.keys():
                 batch[key] = batch[key].to(local_rank)
@@ -220,11 +216,6 @@ def evaluation(
     while iteration < args.eval_iters:
         iteration += 1
         batch = next(eval_dataloader)
-
-        del batch["dataset_id"]
-        del batch["attention_mask"]
-        batch["attention_mask"] = batch["loss_mask"]
-        del batch["loss_mask"]
 
         for key in batch.keys():
             batch[key] = batch[key].to(local_rank)
