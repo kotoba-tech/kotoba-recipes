@@ -22,30 +22,24 @@ export MASTER_PORT=$((10000 + ($JOB_ID % 50000)))
 
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
-start=50000
-end=50000
-increment=200
+start=5000
+end=5000
+increment=5000
 
 for ((i = start; i <= end; i += increment)); do
   ITERATION=$i
   FORMATTED_ITERATION=$(printf "iter_%07d" $ITERATION)
 
-  CHECK_POINT_PATH=/groups/gaf51275/llama/checkpoints/llama-2-7b-base/instruction/4%-sq-512/${FORMATTED_ITERATION}/model.pt
-  OUTPUT_PATH=/bb/llm/gaf51275/llama/checkpoints/parallel/4%/instruction/initial/normal/hf_checkpoint
+  CHECK_POINT_PATH=/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc-lr=6e-5-minlr=2e-6/${FORMATTED_ITERATION}/model.pt
+  OUTPUT_PATH=/bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/${FORMATTED_ITERATION}
 
   echo "convert ${CHECK_POINT_PATH} to ${OUTPUT_PATH}"
 
   mkdir -p $OUTPUT_PATH
 
-  BASE_MODEL_CHECKPOINT=/bb/llm/gaf51275/llama/huggingface-checkpoint/Llama-2-7b-hf
+  BASE_MODEL_CHECKPOINT=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
 
-  mpirun -np 8 \
-    --npernode 8 \
-    -x MASTER_ADDR=$MASTER_ADDR \
-    -x MASTER_PORT=$MASTER_PORT \
-    -bind-to none -map-by slot \
-    -x PATH \
-    python tools/checkpoint-convert/convert_ckpt.py \
+  python tools/checkpoint-convert/convert_ckpt.py \
     --model $BASE_MODEL_CHECKPOINT \
     --ckpt $CHECK_POINT_PATH \
     --out $OUTPUT_PATH
