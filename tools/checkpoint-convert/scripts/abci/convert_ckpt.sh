@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -l rt_AF=1
+#$ -l rt_F=1
 #$ -l h_rt=10:00:00
 #$ -j y
 #$ -o outputs/convert/ckpt/
@@ -22,15 +22,15 @@ export MASTER_PORT=$((10000 + ($JOB_ID % 50000)))
 
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
-start=5000
-end=5000
+start=500
+end=500
 increment=5000
 
 for ((i = start; i <= end; i += increment)); do
   ITERATION=$i
   FORMATTED_ITERATION=$(printf "iter_%07d" $ITERATION)
 
-  CHECK_POINT_PATH=/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc-lr=6e-5-minlr=2e-6/${FORMATTED_ITERATION}/model.pt
+  CHECK_POINT_PATH=/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/okazaki-cc-lr=1e-4-minlr=3.3e-6/${FORMATTED_ITERATION}/model.pt
   OUTPUT_PATH=/bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/${FORMATTED_ITERATION}
 
   echo "convert ${CHECK_POINT_PATH} to ${OUTPUT_PATH}"
