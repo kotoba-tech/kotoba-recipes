@@ -2,11 +2,11 @@
 
 set -e
 
-start=10000
-end=12000
-increment=1000
+start=5000
+end=5000
+increment=5000
 
-upload_base_dir=/bb/gaf51217/fujii/hf_checkpoints/kotoba/llama-2-13b-base-filtered-gbs_16
+upload_base_dir=/bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc
 
 # for ループで指定された範囲と増分を使用
 for ((i = start; i <= end; i += increment)); do
@@ -14,5 +14,5 @@ for ((i = start; i <= end; i += increment)); do
 
   python scripts/kotoba/upload/upload.py \
     --ckpt-path $upload_dir \
-    --repo-name kotoba-tech/Llama2-13b-base-gbs16-no-title-iter$(printf "%07d" $i)
+    --repo-name tokyotech-llm/Mistral-7B-VE-okazaki-cc-iter$(printf "%07d" $i)
 done
