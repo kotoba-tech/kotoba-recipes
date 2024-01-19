@@ -23,11 +23,11 @@ export MASTER_PORT=$((10000 + ($JOB_ID % 50000)))
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
 python tools/inference/inference.py \
-  --model-path /bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/iter_0000500 \
-  --tokenizer-path /bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/iter_0000500 \
+  --model-path /bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/iter_0004000 \
+  --tokenizer-path /bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/iter_0004000 \
   --prompt "Tokyo is the capital of Japan."
 
 python tools/inference/inference.py \
-  --model-path /bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/iter_0000500 \
-  --tokenizer-path /bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/iter_0000500 \
+  --model-path /bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/iter_0004000 \
+  --tokenizer-path /bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc/iter_0004000 \
   --prompt "東京工業大学のキャンパスは"
