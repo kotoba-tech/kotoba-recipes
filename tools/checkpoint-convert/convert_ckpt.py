@@ -11,6 +11,7 @@ def main() -> None:
     )
     parser.add_argument("--ckpt", type=str, required=True, help="Path to checkpoint (`model.pth`)")
     parser.add_argument("--out", type=str, required=True, help="Path to output directory")
+    parser.add_argument("--sequence-length", type=int, required=True)
     args = parser.parse_args()
 
     print(f"Loading HF model: {args.model}", flush=True)
@@ -18,6 +19,7 @@ def main() -> None:
         args.model,
         torch_dtype=torch.bfloat16,
         trust_remote_code=True,
+        max_position_embeddings=args.sequence_length,
     )
 
     print(f"Loading CKPT: {args.ckpt}", flush=True)

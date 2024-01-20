@@ -42,5 +42,6 @@ for ((i = start; i <= end; i += increment)); do
   python tools/checkpoint-convert/convert_ckpt.py \
     --model $BASE_MODEL_CHECKPOINT \
     --ckpt $CHECK_POINT_PATH \
-    --out $OUTPUT_PATH
+    --out $OUTPUT_PATH \
+    --sequence-length 4096
 done
