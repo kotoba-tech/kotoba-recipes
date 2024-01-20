@@ -2,8 +2,8 @@
 
 set -e
 
-start=5000
-end=5000
+start=10000
+end=15000
 increment=5000
 
 upload_base_dir=/bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/okazaki-cc

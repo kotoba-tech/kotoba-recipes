@@ -22,8 +22,8 @@ export MASTER_PORT=$((10000 + ($JOB_ID % 50000)))
 
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
-start=5000
-end=5000
+start=10000
+end=15000
 increment=5000
 
 for ((i = start; i <= end; i += increment)); do
