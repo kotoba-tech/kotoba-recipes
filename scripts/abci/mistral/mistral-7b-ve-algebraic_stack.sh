@@ -52,8 +52,8 @@ GLOBAL_BATCH_SIZE=1024
 TRAIN_STEPS=25000
 
 # optimizer config
-LR=1e-4
-MIN_LR=3.3e-6
+LR=6e-5
+MIN_LR=2e-6
 LR_WARMUP_STEPS=1000
 LR_DECAY_STEPS=25000
 WEIGHT_DECAY=0.1
@@ -62,7 +62,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/merged_tokenizer_sp/jalm_llama.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
-CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/algebraic-stack"
+CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/algebraic-stack_LR=${LR}-MINLR=${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
