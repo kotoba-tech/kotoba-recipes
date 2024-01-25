@@ -34,12 +34,15 @@ if branch_name != "main":
 print(f"to upload: {files}")
 for file in files:
     print(f"Uploading {file} to branch {branch_name}...")
-    api.upload_file(
-        path_or_fileobj=os.path.join(converted_ckpt, file),
-        path_in_repo=file,
-        repo_id=repo_name,
-        repo_type="model",
-        commit_message=f"Upload {file}",
-        revision=branch_name,
-    )
+    try:
+        api.upload_file(
+            path_or_fileobj=os.path.join(converted_ckpt, file),
+            path_in_repo=file,
+            repo_id=repo_name,
+            repo_type="model",
+            commit_message=f"Upload {file}",
+            revision=branch_name,
+        )
+    except Exception as e:
+        print(e)
     print(f"Successfully uploaded {file} !")
