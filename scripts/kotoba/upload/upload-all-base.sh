@@ -2,8 +2,8 @@
 
 set -e
 
-start=15000
-end=20000
+start=25000
+end=25000
 increment=5000
 
 upload_base_dir=/bb/llm/gaf51275/llama/converted-hf-checkpoint/mistral-7B-VE/algebraic-stack
