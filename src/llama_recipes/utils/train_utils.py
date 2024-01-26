@@ -239,15 +239,35 @@ def evaluation(
     return eval_ppl, eval_epoch_loss
 
 
-def freeze_transformer_layers(model, num_layer: int) -> None:
-    """transformerの一部のlayerをfreezeする
+def parse_layer_ranges(layer_ranges: str) -> list:
+    """parse layer ranges
 
     Args:
-        model: モデル
-        num_layer (int): freezeするlayerの数 [0〜 num_layer)
+        layer_ranges (str): (ex: '1-5,7-9')
+
+    Returns:
+        list: freezed layers' list
     """
+    layers_to_freeze: list[int] = []
+    for part in layer_ranges.split(','):
+        if '-' in part:
+            start, end = part.split('-')
+            layers_to_freeze.extend(range(int(start), int(end) + 1))
+        else:
+            layers_to_freeze.append(int(part))
+    return layers_to_freeze
+
+
+def freeze_transformer_layers(model, layer_ranges: str) -> None:
+    """freeze transformer layers
+
+    Args:
+        model:
+        layer_ranges: str
+    """
+    layers_to_freeze = parse_layer_ranges(layer_ranges)
     for i, layer in enumerate(model.model.layers):
-        if i < num_layer:
+        if i in layers_to_freeze:
             for param in layer.parameters():
                 param.requires_grad = False
 

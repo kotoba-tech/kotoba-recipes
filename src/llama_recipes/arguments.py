@@ -156,8 +156,10 @@ def _add_training_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
 
     # PEFT
     group.add_argument("--quantization", action="store_true")
-    group.add_argument("--freeze-layers", action="store_true")
-    group.add_argument("--num-freeze-layers", type=int, default=0)
+    group.add_argument("--use-freeze-layers", action="store_true")
+    group.add_argument(
+        "--freeze-layers", type=str, help="freezed layers (ex: 1-5,7-9) 0-indexed", default=None
+    )
 
     # precision
     group.add_argument("--bf16", action="store_true")

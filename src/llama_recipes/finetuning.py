@@ -122,9 +122,9 @@ def main() -> None:
     elif args.fp16:
         model.to(torch.float16)  # type: ignore
 
-    if args.freeze_layers:
+    if args.use_freeze_layers:
         print_rank_0("NOTE: freeze transformer layers")
-        freeze_transformer_layers(model=model, num_layer=args.num_freeze_layers)
+        freeze_transformer_layers(model=model, layer_ranges=args.freeze_layers)
 
     mixed_precision_policy, wrapping_policy = get_policies(
         rank=get_rank(),
