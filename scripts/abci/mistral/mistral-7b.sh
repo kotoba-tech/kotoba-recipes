@@ -45,6 +45,7 @@ done <"$SGE_JOB_HOSTLIST" >"$HOSTFILE_NAME"
 
 # training config
 SEQ_LENGTH=4096
+SLIDING_WINDOW_SIZE=4096
 DATA_PARALLEL_SIZE=$NUM_GPUS
 
 MICRO_BATCH_SIZE=8
@@ -62,7 +63,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1/tokenizer.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1
-CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b/okazaki-cc-lr_${LR}-minlr_${MIN_LR}"
+CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b/okazaki-cc-lr_${LR}-minlr_${MIN_LR}_warmup_${LR_WARMUP_STEPS}_sliding_window_${SLIDING_WINDOW_SIZE}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -100,7 +101,7 @@ mpirun -np $NUM_GPUS \
   -x PATH \
   python examples/finetuning.py \
   --seq-length ${SEQ_LENGTH} \
-  --sliding-window-size ${SEQ_LENGTH} \
+  --sliding-window-size ${SLIDING_WINDOW_SIZE} \
   --micro-batch-size ${MICRO_BATCH_SIZE} \
   --global-batch-size ${GLOBAL_BATCH_SIZE} \
   --train-iters ${TRAIN_STEPS} \
