@@ -16,6 +16,10 @@ def parse_args() -> argparse.Namespace:
     args.rank = int(os.getenv('RANK', '0'))
     args.world_size = int(os.getenv("WORLD_SIZE", '1'))
 
+    # validate
+    if args.use_freeze_layers:
+        assert args.no_save_optimizer_state is True
+
     return args
 
 
@@ -246,6 +250,9 @@ def _add_training_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
 
     # loss spike
     group.add_argument("--skip-batch", nargs='*', default=None)
+
+    # checkpoint
+    group.add_argument("--no-save-optimizer-state", action="store_true")
 
     return parser
 

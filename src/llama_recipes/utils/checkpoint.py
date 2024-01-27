@@ -9,6 +9,7 @@ from torch.distributed.fsdp import (  # noqa: F401
 from torch.distributed.fsdp.api import FullOptimStateDictConfig
 from pathlib import Path
 import os
+from megatron_lm.megatron.global_vars import get_args
 
 
 def get_model_state_dict(model: FSDP) -> dict[str, torch.Tensor]:
@@ -95,6 +96,7 @@ def save_checkpoint(
     iteration: int,
 ) -> None:
     torch_distributed.barrier()
+    args = get_args()
 
     checkpoint_path: str = get_checkpoint_name(path, iteration)
     os.makedirs(checkpoint_path, exist_ok=True)
@@ -106,11 +108,13 @@ def save_checkpoint(
         model=model,
         path=f"{checkpoint_path}/model.pt",
     )
-    save_optimizer_state_dict(
-        model=model,
-        optimizer=optimizer,
-        path=f"{checkpoint_path}/optimizer.pt",
-    )
+    if not args.no_save_optimizer_state:
+        save_optimizer_state_dict(
+            model=model,
+            optimizer=optimizer,
+            path=f"{checkpoint_path}/optimizer.pt",
+        )
+
     save_scheduler_state_dict(
         scheduler=scheduler,
         path=f"{checkpoint_path}/scheduler.pt",
