@@ -84,13 +84,27 @@ def get_model(
 
     elif "Mixtral" in model_name:
 
-        model = MixtralForCausalLM.from_pretrained(
-            model_name,
-            device_map="auto",
-            attn_implementation="flash_attention_2",
-            max_position_embeddings=4096,
-            torch_dtype=torch.bfloat16 if args.bf16 else torch.float16,
-        )
+        if is_rank_0():
+            model = MixtralForCausalLM.from_pretrained(
+                model_name,
+                device_map="auto",
+                attn_implementation="flash_attention_2",
+                max_position_embeddings=args.seq_length,
+                torch_dtype=torch.bfloat16 if args.bf16 else torch.float16,
+                use_cache=use_cache,
+            )
+        else:
+            mixtral_config = MixtralConfig.from_pretrained(
+                model_name,
+                max_position_embeddings=args.seq_length,
+                torch_dtype=torch.bfloat16 if args.bf16 else torch.float16,
+                use_cache=use_cache,
+            )
+            if args.no_meta_device:
+                model = MixtralForCausalLM(mixtral_config)
+            else:
+                with torch.device("meta"):
+                    model = MixtralForCausalLM(mixtral_config)
 
         return model  # type: ignore
 
