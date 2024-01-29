@@ -1,8 +1,8 @@
 #!/bin/bash
 #$ -l rt_AF=16
-#$ -l h_rt=10:0:00:00
+#$ -l h_rt=5:00:00:00
 #$ -j y
-#$ -o outputs/mistral-7b-ve/the-vault/
+#$ -o outputs/mistral-7b-NVE/okazaki-cc/
 #$ -cwd
 
 # module load
@@ -45,6 +45,7 @@ done <"$SGE_JOB_HOSTLIST" >"$HOSTFILE_NAME"
 
 # training config
 SEQ_LENGTH=4096
+SLIDING_WINDOW_SIZE=4096
 DATA_PARALLEL_SIZE=$NUM_GPUS
 
 MICRO_BATCH_SIZE=8
@@ -60,9 +61,9 @@ WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
 # checkpoint & tokenizer
-TOKENIZER_MODEL=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/merged_tokenizer_sp/jalm_llama.model
-CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
-CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/the-vault-lr_${LR}-minlr_${MIN_LR}"
+TOKENIZER_MODEL=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1/tokenizer.model
+CHECKPOINT_DIR=/bb/llm/gaf51275/llama/huggingface-checkpoint/Mistral-7B-v0.1
+CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b/okazaki-cc-lr_${LR}-minlr_${MIN_LR}_warmup_${LR_WARMUP_STEPS}_sliding_window_${SLIDING_WINDOW_SIZE}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -71,27 +72,24 @@ mkdir -p ${CHECKPOINT_SAVE_DIR}
 DATA_PATH=""
 
 # ja okazaki lab cc
-DATA_PATH="${DATA_PATH} 9603316427 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_0_text_document"
-DATA_PATH="${DATA_PATH} 9477885232 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_1_text_document"
-DATA_PATH="${DATA_PATH} 11289947192 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_2_text_document"
-DATA_PATH="${DATA_PATH} 14893976918 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_3_text_document"
-DATA_PATH="${DATA_PATH} 34740079578 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_4_text_document"
+DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer-copy/okazaki_lab_cc_03_1500_split_0_text_document"
+DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer-copy/okazaki_lab_cc_03_1500_split_1_text_document"
+DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer-copy/okazaki_lab_cc_03_1500_split_2_text_document"
+DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer-copy/okazaki_lab_cc_03_1500_split_3_text_document"
+DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer-copy/okazaki_lab_cc_03_1500_split_4_text_document"
 
 # ja wikipedia
-DATA_PATH="${DATA_PATH} 1512820604 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/ja_wiki_merged_text_document"
+DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer-copy/ja_wiki_merged_text_document"
 
 # en arxiv
-DATA_PATH="${DATA_PATH} 4528779220 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/arxiv_text_document"
+DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer-copy/arxiv_text_document"
 
 # en refinedweb
-DATA_PATH="${DATA_PATH} 4528779220 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/falcon_text_document"
-
-# the vault
-DATA_PATH="${DATA_PATH} 9424415609 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/The_Vault_text_document"
+DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer-copy/falcon_text_document"
 
 
 # job name
-JOB_NAME="Mistral-7b-VE-the-vault-${NODE_TYPE}-${NUM_NODES}node-${NUM_GPUS}gpu-${SEQ_LENGTH}s-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}-WARMUP=${LR_WARMUP_STEPS}-WD=${WEIGHT_DECAY}-GC=${GRAD_CLIP}"
+JOB_NAME="Mistral-7b-NVE-algebraic-stack-${NODE_TYPE}-${NUM_NODES}node-${NUM_GPUS}gpu-${SEQ_LENGTH}s-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}-WARMUP=${LR_WARMUP_STEPS}-WD=${WEIGHT_DECAY}-GC=${GRAD_CLIP}"
 
 # run
 mpirun -np $NUM_GPUS \
@@ -103,7 +101,7 @@ mpirun -np $NUM_GPUS \
   -x PATH \
   python examples/finetuning.py \
   --seq-length ${SEQ_LENGTH} \
-  --sliding-window-size ${SEQ_LENGTH} \
+  --sliding-window-size ${SLIDING_WINDOW_SIZE} \
   --micro-batch-size ${MICRO_BATCH_SIZE} \
   --global-batch-size ${GLOBAL_BATCH_SIZE} \
   --train-iters ${TRAIN_STEPS} \

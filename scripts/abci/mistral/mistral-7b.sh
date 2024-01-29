@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -l rt_AF=16
-#$ -l h_rt=0:7:30:00
+#$ -l h_rt=5:00:00:00
 #$ -j y
 #$ -o outputs/mistral-7b-NVE/okazaki-cc/
 #$ -cwd
