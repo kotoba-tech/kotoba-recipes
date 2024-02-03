@@ -2,7 +2,7 @@
 #$ -l rt_AF=4
 #$ -l h_rt=12:0:00:00
 #$ -j y
-#$ -o outputs/mistral-7b-ve/code&math/
+#$ -o outputs/mistral-7b-ve/code-math/
 #$ -cwd
 
 # module load
@@ -97,7 +97,7 @@ DATA_PATH="${DATA_PATH} 3333333333 /bb/llm/gaf51275/llama/datasets/mistral_16k_L
 
 
 # job name
-JOB_NAME="Mistral-7b-VE-code&math-${NODE_TYPE}-${NUM_NODES}node-${NUM_GPUS}gpu-${SEQ_LENGTH}s-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}-WARMUP=${LR_WARMUP_STEPS}-WD=${WEIGHT_DECAY}-GC=${GRAD_CLIP}"
+JOB_NAME="Mistral-7b-VE-code-math-${NODE_TYPE}-${NUM_NODES}node-${NUM_GPUS}gpu-${SEQ_LENGTH}s-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}-WARMUP=${LR_WARMUP_STEPS}-WD=${WEIGHT_DECAY}-GC=${GRAD_CLIP}"
 
 # run
 mpirun -np $NUM_GPUS \
