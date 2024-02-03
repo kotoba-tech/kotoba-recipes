@@ -71,23 +71,29 @@ mkdir -p ${CHECKPOINT_SAVE_DIR}
 DATA_PATH=""
 
 # ja okazaki lab cc
-DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_0_text_document"
-DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_1_text_document"
-DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_2_text_document"
-DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_3_text_document"
-DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_4_text_document"
+DATA_PATH="${DATA_PATH} 9542289837 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_0_text_document"
+DATA_PATH="${DATA_PATH} 9417655725 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_1_text_document"
+DATA_PATH="${DATA_PATH} 11218202500 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_2_text_document"
+DATA_PATH="${DATA_PATH} 14799329550 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_3_text_document"
+DATA_PATH="${DATA_PATH} 34519315366 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/okazaki_lab_cc_03_1500_split_4_text_document"
 
 # ja wikipedia
-DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/ja_wiki_merged_text_document"
+DATA_PATH="${DATA_PATH} 1503207021 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/ja_wiki_merged_text_document"
 
 # en arxiv
-DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/arxiv_text_document"
+DATA_PATH="${DATA_PATH} 4500000000 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/arxiv_text_document"
 
 # en refinedweb
-DATA_PATH="${DATA_PATH}  /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/falcon_text_document"
+DATA_PATH="${DATA_PATH} 4500000000 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/falcon_text_document"
 
 # code&math
-DATA_PATH="${DATA_PATH}  "
+
+# the Vault
+DATA_PATH="${DATA_PATH} 3333333333 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/The_Vault_text_document"
+# algebraic stack
+DATA_PATH="${DATA_PATH} 3333333333 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/algebraic_stack_text_document"
+# starcoderdata
+DATA_PATH="${DATA_PATH} 3333333333 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/starcoderdata_text_document"
 
 
 # job name
