@@ -62,7 +62,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/tokenizer.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
-CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/code&math-lr_${LR}-minlr_${MIN_LR}"
+CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/code-math-lr_${LR}-minlr_${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -86,7 +86,7 @@ DATA_PATH="${DATA_PATH} 4500000000 /bb/llm/gaf51275/llama/datasets/mistral_16k_L
 # en refinedweb
 DATA_PATH="${DATA_PATH} 4500000000 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/falcon_text_document"
 
-# code&math
+# code and math
 
 # the Vault
 DATA_PATH="${DATA_PATH} 3333333333 /bb/llm/gaf51275/llama/datasets/mistral_16k_Llama2Tokenizer/The_Vault_text_document"
