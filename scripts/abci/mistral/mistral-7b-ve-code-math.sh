@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -l rt_AF=4
-#$ -l h_rt=12:0:00:00
+#$ -l h_rt=9:8:00:00
 #$ -j y
 #$ -o outputs/mistral-7b-ve/code-math/
 #$ -cwd
@@ -62,7 +62,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf/tokenizer.model
 CHECKPOINT_DIR=/bb/llm/gaf51275/llama/mistral/swallow-mistral-7B-v0.1-merged-tokenizer-nfkc-16k-hf
-CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/code-math-lr_${LR}-minlr_${MIN_LR}"
+CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/algebraic-stack-the-vault-lr_${LR}-minlr_${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -89,17 +89,10 @@ DATA_PATH="${DATA_PATH} 4500000000 /bb/llm/gaf51275/llama/datasets/mistral_origi
 # code and math
 
 # the Vault
-DATA_PATH="${DATA_PATH} 3000000000 /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer/The_Vault_text_text_document"
+DATA_PATH="${DATA_PATH} 5000000000 /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer/The_Vault_text_text_document"
 
 # algebraic stack
-DATA_PATH="${DATA_PATH} 3000000000 /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer/algebraic_stack_text_document"
-
-# starcoderdata
-DATA_PATH="${DATA_PATH} 1621975641 /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer/starcoderdata_text_document"
-
-# starcoderdata (ja)
-DATA_PATH="${DATA_PATH} 2378024359 /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer/starcoderdata_ja_text_text_document"
-
+DATA_PATH="${DATA_PATH} 5000000000 /bb/llm/gaf51275/llama/datasets/mistral_original/Llama2Tokenizer/algebraic_stack_text_document"
 
 # job name
 JOB_NAME="Mistral-7b-VE-code-math-${NODE_TYPE}-${NUM_NODES}node-${NUM_GPUS}gpu-${SEQ_LENGTH}s-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}-WARMUP=${LR_WARMUP_STEPS}-WD=${WEIGHT_DECAY}-GC=${GRAD_CLIP}"
