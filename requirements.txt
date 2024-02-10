@@ -31,4 +31,5 @@ mpi4py
 
 # megatron-lm
 nltk
+pybind11
 

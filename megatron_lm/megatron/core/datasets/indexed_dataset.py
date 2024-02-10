@@ -20,7 +20,7 @@ from numpy.typing import NDArray
 import numpy
 import torch
 
-from megatron.core.datasets.utils import log_single_rank
+from megatron_lm.megatron.core.datasets.utils import log_single_rank
 
 logger = logging.getLogger(__name__)
 

@@ -8,8 +8,7 @@ from typing import Callable, List, Optional, Tuple
 
 import torch
 
-from megatron.core.datasets.utils import Split, log_single_rank, normalize
-from megatron.core.parallel_state import get_virtual_pipeline_model_parallel_rank
+from megatron_lm.megatron.core.datasets.utils import Split, log_single_rank, normalize
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +66,7 @@ class BlendedMegatronDatasetConfig:
     def __post_init__(self):
         if torch.distributed.is_initialized():
             gb_rank = torch.distributed.get_rank()
-            vp_rank = get_virtual_pipeline_model_parallel_rank()
+            vp_rank = 0
             if gb_rank == 0 and (vp_rank == 0 or vp_rank is None):
                 assert (
                     self.is_built_on_rank()

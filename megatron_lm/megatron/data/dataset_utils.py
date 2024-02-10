@@ -22,38 +22,39 @@ import math
 import os
 import time
 import collections
+from networkx import trophic_differences
 
 import numpy as np
 import torch
+import torch.distributed as torch_distributed
 
-from megatron import (
+from megatron_lm.megatron.global_vars import (
     get_args,
-    print_rank_0
 )
-from megatron.core import mpu
-from megatron.core.datasets.indexed_dataset import MMapIndexedDataset
+from llama_recipes.utils.distributed import print_rank_0
+from megatron_lm.megatron.core.datasets.indexed_dataset import MMapIndexedDataset
 
 
 DSET_TYPE_BERT = 'standard_bert'
-DSET_TYPE_ICT = 'ict'
-DSET_TYPE_T5  = 't5'
-DSET_TYPE_MULTIMODAL = 'multimodal'
 
-DSET_TYPES = [DSET_TYPE_BERT, DSET_TYPE_ICT, DSET_TYPE_T5, DSET_TYPE_MULTIMODAL]
+DSET_TYPES = [DSET_TYPE_BERT]
 
 
-def get_datasets_weights_and_num_samples(data_prefix,
-                                         train_valid_test_num_samples):
+def get_datasets_weights_and_num_samples(
+    data_prefix: list[str],
+    train_valid_test_num_samples: list[float] | float,
+) -> tuple[list[str], list[float], list[int]]:
 
     # The data prefix should be in the format of:
     #   weight-1, data-prefix-1, weight-2, data-prefix-2, ..
     assert len(data_prefix) % 2 == 0
-    num_datasets = len(data_prefix) // 2
-    weights = [0]*num_datasets
-    prefixes = [0]*num_datasets
+    num_datasets: int = len(data_prefix) // 2
+    weights: list[float] = [0] * num_datasets
+    prefixes: list[str] = [""] * num_datasets
+
     for i in range(num_datasets):
-        weights[i] = float(data_prefix[2*i])
-        prefixes[i] = (data_prefix[2*i+1]).strip()
+        weights[i] = float(data_prefix[2 * i])
+        prefixes[i] = (data_prefix[2 * i + 1]).strip()
     # Normalize weights
     weight_sum = 0.0
     for weight in weights:
@@ -61,15 +62,14 @@ def get_datasets_weights_and_num_samples(data_prefix,
     assert weight_sum > 0.0
     weights = [weight / weight_sum for weight in weights]
 
-    # Add 0.5% (the 1.005 factor) so in case the bleding dataset does
+    # Add 0.5% (the 1.005 factor) so in case the blending dataset does
     # not uniformly distribute the number of samples, we still have
     # samples left to feed to the network.
     if isinstance(train_valid_test_num_samples, list):
-        datasets_train_valid_test_num_samples = []
+        datasets_train_valid_test_num_samples: list[int] = []
         for weight in weights:
             datasets_train_valid_test_num_samples.append(
-                [int(math.ceil(val * weight * 1.005))
-                for val in train_valid_test_num_samples])
+                [int(math.ceil(val * weight * 1.005)) for val in train_valid_test_num_samples])  # type: ignore
     else:
         # Used when separate dataset files are provided for train,
         # valid and test
@@ -114,10 +114,11 @@ def get_a_and_b_segments(sample, np_rng):
 
 def truncate_segments(tokens_a, tokens_b, len_a, len_b, max_num_tokens, np_rng):
     """Truncates a pair of sequences to a maximum sequence length."""
-    #print(len_a, len_b, max_num_tokens)
     assert len_a > 0
+
     if len_a + len_b <= max_num_tokens:
         return False
+
     while len_a + len_b > max_num_tokens:
         if len_a > len_b:
             len_a -= 1
@@ -257,8 +258,8 @@ def create_masked_lm_predictions(tokens,
 
         if not geometric_dist:
             n = np_rng.choice(ngrams[:len(cand_index_set)],
-                              p=pvals[:len(cand_index_set)] /
-                              pvals[:len(cand_index_set)].sum(keepdims=True))
+                              p=pvals[:len(cand_index_set)] /  # type: ignore
+                              pvals[:len(cand_index_set)].sum(keepdims=True))  # type: ignore
         else:
             # Sampling "n" from the geometric distribution and clipping it to
             # the max_ngrams. Using p=0.2 default from the SpanBERT paper
@@ -330,8 +331,8 @@ def create_masked_lm_predictions(tokens,
                         continue
 
             n = np.random.choice(ngrams[:len(cand_index_set)],
-                                 p=pvals[:len(cand_index_set)] /
-                                 pvals[:len(cand_index_set)].sum(keepdims=True))
+                                 p=pvals[:len(cand_index_set)] /  # type: ignore
+                                 pvals[:len(cand_index_set)].sum(keepdims=True))  # type: ignore
             index_set = sum(cand_index_set[n - 1], [])
             n -= 1
 
@@ -432,14 +433,14 @@ def build_train_valid_test_datasets_with_prefixes(train_valid_test_num_samples,
                                       train_valid_test_num_samples[1],
                                       max_seq_length, seed, False,
                                       binary_head, max_seq_length_dec,
-                                      dataset_type=dataset_type)
+                                      dataset_type=dataset_type)  # type: ignore
 
     if test_data_prefix is not None:
         test_dataset = build_dataset("test", test_data_prefix,
                                      train_valid_test_num_samples[2],
                                      max_seq_length, seed, False,
                                      binary_head, max_seq_length_dec,
-                                     dataset_type=dataset_type)
+                                     dataset_type=dataset_type)  # type: ignore
 
     return (train_dataset, valid_dataset, test_dataset)
 
@@ -522,7 +523,7 @@ def _build_train_valid_test_datasets(data_prefix, splits_string,
             assert indexed_dataset.document_indices.shape[0] == \
                 (total_num_of_documents + 1)
         return dataset
-    
+
     train_dataset = build_split_dataset(0, 'train')
     valid_dataset = build_split_dataset(1, 'valid')
     test_dataset = build_split_dataset(2, 'test')
@@ -530,22 +531,27 @@ def _build_train_valid_test_datasets(data_prefix, splits_string,
     return (train_dataset, valid_dataset, test_dataset)
 
 
-def build_dataset(name, data_prefix, max_num_samples,
-                  max_seq_length, seed, binary_head,
-                  max_seq_length_dec, dataset_type='standard_bert',
-                  indexed_dataset=None):
+def build_dataset(
+    name,
+    data_prefix,
+    max_num_samples,
+    max_seq_length,
+    seed,
+    binary_head,
+    max_seq_length_dec,
+    dataset_type='standard_bert',
+    indexed_dataset=None
+):
 
-    from megatron.data.bert_dataset import BertDataset
-    from megatron.data.ict_dataset import ICTDataset
-    from megatron.data.t5_dataset import T5Dataset
-    from megatron.data.multimodal_dataset import MultiModalDataset
+    from megatron_lm.megatron.data.bert_dataset import BertDataset
 
     if dataset_type not in DSET_TYPES:
         raise ValueError("Invalid dataset_type: ", dataset_type)
 
     if indexed_dataset is None:
-        indexed_dataset = get_indexed_dataset_(data_prefix,
-                                               dataset_type)
+        indexed_dataset = get_indexed_dataset_(
+            data_prefix, dataset_type
+        )
 
     kwargs = dict(
         name=name,
@@ -556,31 +562,7 @@ def build_dataset(name, data_prefix, max_num_samples,
         seed=seed,
     )
 
-    if dataset_type == DSET_TYPE_ICT:
-        args = get_args()
-
-        title_dataset = get_indexed_dataset_(
-            args.titles_data_path,
-            dataset_type)
-
-        dataset = ICTDataset(
-            block_dataset=indexed_dataset,
-            title_dataset=title_dataset,
-            query_in_block_prob=args.query_in_block_prob,
-            use_one_sent_docs=args.use_one_sent_docs,
-            binary_head=binary_head,
-            **kwargs
-        )
-    elif dataset_type == DSET_TYPE_T5:
-        args = get_args()
-        dataset = T5Dataset(
-            indexed_dataset=indexed_dataset,
-            masked_lm_prob=args.mask_prob,
-            max_seq_length_dec=max_seq_length_dec,
-            short_seq_prob=args.short_seq_prob,
-            **kwargs
-        )
-    elif dataset_type == DSET_TYPE_BERT:
+    if dataset_type == DSET_TYPE_BERT:
         args = get_args()
         dataset = BertDataset(
             indexed_dataset=indexed_dataset,
@@ -588,18 +570,6 @@ def build_dataset(name, data_prefix, max_num_samples,
             short_seq_prob=args.short_seq_prob,
             binary_head=binary_head,
             **kwargs
-        )
-    elif dataset_type == DSET_TYPE_MULTIMODAL:
-        args = get_args()
-        dataset = MultiModalDataset(
-            name=name,
-            data_prefix=data_prefix,
-            indexed_dataset=indexed_dataset,
-            num_samples=max_num_samples,
-            seq_length=max_seq_length,
-            seed=seed,
-            img_h=args.img_h,
-            img_w=args.img_w,
         )
     else:
         raise NotImplementedError("Dataset type not fully implemented.")
@@ -612,17 +582,14 @@ def get_indexed_dataset_(data_prefix, dataset_type):
     print_rank_0(' > building dataset index ...')
 
     start_time = time.time()
-    multimodal = dataset_type == DSET_TYPE_MULTIMODAL
+    multimodal = False
     indexed_dataset = MMapIndexedDataset(data_prefix, multimodal)
     assert indexed_dataset.sequence_lengths.shape[0] == indexed_dataset.document_indices[-1]
-    print_rank_0(' > finished creating indexed dataset in {:4f} '
-                 'seconds'.format(time.time() - start_time))
+    print_rank_0(' > finished creating indexed dataset in {:4f} seconds'.format(time.time() - start_time))
 
     print_rank_0(' > indexed dataset stats:')
-    print_rank_0('    number of documents: {}'.format(
-        indexed_dataset.document_indices.shape[0] - 1))
-    print_rank_0('    number of sentences: {}'.format(
-        indexed_dataset.sequence_lengths.shape[0]))
+    print_rank_0('    number of documents: {}'.format(indexed_dataset.document_indices.shape[0] - 1))
+    print_rank_0('    number of sentences: {}'.format(indexed_dataset.sequence_lengths.shape[0]))
 
     return indexed_dataset
 
@@ -653,6 +620,7 @@ def get_train_valid_test_split_(splits_string, size):
     assert len(splits_index) == 4
     assert splits_index[-1] == size
     return splits_index
+
 
 def get_samples_mapping(indexed_dataset,
                         data_prefix,
@@ -686,10 +654,8 @@ def get_samples_mapping(indexed_dataset,
     indexmap_filename += '.npy'
 
     # Build the indexed mapping if not exist.
-    if torch.distributed.get_rank() == 0 and \
-       not os.path.isfile(indexmap_filename):
-        print(' > WARNING: could not find index map file {}, building '
-              'the indices on rank 0 ...'.format(indexmap_filename))
+    if torch.distributed.get_rank() == 0 and not os.path.isfile(indexmap_filename):
+        print(' > WARNING: could not find index map file {}, building the indices on rank 0 ...'.format(indexmap_filename))
 
         # Make sure the types match the helpers input types.
         assert indexed_dataset.document_indices.dtype == np.int64
@@ -701,7 +667,7 @@ def get_samples_mapping(indexed_dataset,
         print_rank_0(' > building samples index mapping for {} ...'.format(
             name))
         # First compile and then import.
-        from megatron.core.datasets import helpers
+        from megatron_lm.megatron.core.datasets import helpers
         samples_mapping = helpers.build_mapping(
             indexed_dataset.document_indices,
             indexed_dataset.sequence_lengths,
@@ -712,23 +678,19 @@ def get_samples_mapping(indexed_dataset,
             seed,
             verbose,
             2 if binary_head else 1)
-        print_rank_0(' > done building samples index maping')
+        print_rank_0(' > done building samples index mapping')
         np.save(indexmap_filename, samples_mapping, allow_pickle=True)
         print_rank_0(' > saved the index mapping in {}'.format(
             indexmap_filename))
         # Make sure all the ranks have built the mapping
-        print_rank_0(' > elasped time to build and save samples mapping '
-                     '(seconds): {:4f}'.format(
-                         time.time() - start_time))
+        print_rank_0(' > elapsed time to build and save samples mapping (seconds): {:4f}'.format(
+            time.time() - start_time))
     # This should be a barrier but nccl barrier assumes
     # device_index=rank which is not the case for model
     # parallel case
     counts = torch.tensor([1], dtype=torch.long, device='cuda')
-    torch.distributed.all_reduce(counts, group=mpu.get_data_parallel_group())
-    torch.distributed.all_reduce(counts, group=mpu.get_pipeline_model_parallel_group())
-    assert counts[0].item() == (
-        torch.distributed.get_world_size() //
-        torch.distributed.get_world_size(group=mpu.get_tensor_model_parallel_group()))
+    torch_distributed.all_reduce(counts)
+    assert counts[0].item() == (torch.distributed.get_world_size())
 
     # Load indexed dataset.
     print_rank_0(' > loading indexed mapping from {}'.format(
