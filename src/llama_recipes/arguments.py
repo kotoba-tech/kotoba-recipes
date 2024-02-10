@@ -257,6 +257,13 @@ def _add_training_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
     # checkpoint
     group.add_argument("--no-save-optimizer-state", action="store_true")
 
+    # continual pre-training
+    group.add_argument("--continual-pretraining", action="store_true")
+    # instruction tuning
+    group.add_argument("--instruction-tuning", action="store_true")
+    # DPO
+    group.add_argument("--direct-preference-optimization", action="store_true")
+
     return parser
 
 

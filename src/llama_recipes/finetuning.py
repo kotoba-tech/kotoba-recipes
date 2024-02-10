@@ -149,23 +149,34 @@ def main() -> None:
     if args.fsdp_activation_checkpointing:
         apply_fsdp_checkpointing(model=model, model_name=args.base_model)
 
-    from llama_recipes.datasets.pretrain_dataset import build_train_valid_test_datasets
-    from megatron_lm.megatron.data.data_samplers import build_pretraining_data_loader
+    if not args.instruction_tuning and not args.direct_preference_optimization:
+        args.continual_pretraining = True
 
-    train_dataset, validation_dataset, test_dataset = build_train_valid_test_datasets()
+    if args.continual_pretraining:
+        from llama_recipes.datasets.pretrain_dataset import build_train_valid_test_datasets
+        from megatron_lm.megatron.data.data_samplers import build_pretraining_data_loader
 
-    args.consumed_train_samples = args.global_batch_size * args.iteration
-    args.consumed_valid_samples = args.global_batch_size * (
-        args.iteration // args.eval_interval) * args.eval_iters
+        train_dataset, validation_dataset, test_dataset = build_train_valid_test_datasets()
 
-    train_dataloader = build_pretraining_data_loader(
-        dataset=train_dataset,
-        consumed_samples=args.consumed_train_samples,
-    )
-    validation_dataloader = build_pretraining_data_loader(
-        dataset=validation_dataset,
-        consumed_samples=args.consumed_valid_samples,
-    )
+        args.consumed_train_samples = args.global_batch_size * args.iteration
+        args.consumed_valid_samples = args.global_batch_size * (
+            args.iteration // args.eval_interval) * args.eval_iters
+
+        train_dataloader = build_pretraining_data_loader(
+            dataset=train_dataset,
+            consumed_samples=args.consumed_train_samples,
+        )
+        validation_dataloader = build_pretraining_data_loader(
+            dataset=validation_dataset,
+            consumed_samples=args.consumed_valid_samples,
+        )
+    else:
+        if args.instruction_tuning:
+            pass
+        elif args.direct_preference_optimization:
+            pass
+        else:
+            raise ValueError("unknown training mode")
 
     if args.bf16 and args.optimizer == "anyprecision":
         optimizer = AnyPrecisionAdamW(
