@@ -1,9 +1,9 @@
 #!/bin/bash
 #YBATCH -r dgx-a100_8
-#SBATCH --job-name=instruction
+#SBATCH --job-name=pretrain
 #SBATCH --time=2:00:00
-#SBATCH --output outputs/instrction/%j.out
-#SBATCH --error errors/instruction/%j.err
+#SBATCH --output outputs/pretrain/%j.out
+#SBATCH --error errors/pretrain/%j.err
 . /etc/profile.d/modules.sh
 module load cuda/11.8
 module load cudnn/cuda-11.x/8.9.0
