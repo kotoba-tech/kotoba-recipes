@@ -1,5 +1,5 @@
 #!/bin/bash
-#YBATCH -r dgx-a100_8
+#YBATCH -r rtx6000-ada_4
 #SBATCH --job-name=instruction
 #SBATCH --time=2:00:00
 #SBATCH --output outputs/instrction/%j.out
@@ -19,7 +19,7 @@ export MASTER_PORT=$((10000 + ($SLURM_JOBID % 50000)))
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
 # hostfile
-export NUM_GPU_PER_NODE=8
+export NUM_GPU_PER_NODE=4
 NODE_TYPE="a100"
 
 NUM_NODES=1

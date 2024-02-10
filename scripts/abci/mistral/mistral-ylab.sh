@@ -1,5 +1,5 @@
 #!/bin/bash
-#YBATCH -r dgx-a100_8
+#YBATCH -r rtx6000-ada_4
 #SBATCH --job-name=pretrain
 #SBATCH --time=2:00:00
 #SBATCH --output outputs/pretrain/%j.out
@@ -19,7 +19,7 @@ export MASTER_PORT=$((10000 + ($SLURM_JOBID % 50000)))
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
 # hostfile
-export NUM_GPU_PER_NODE=8
+export NUM_GPU_PER_NODE=4
 NODE_TYPE="a100"
 
 NUM_NODES=1
@@ -29,7 +29,7 @@ NUM_GPUS=$((${NUM_NODES} * ${NUM_GPU_PER_NODE}))
 SEQ_LENGTH=4096
 DATA_PARALLEL_SIZE=$NUM_GPUS
 
-MICRO_BATCH_SIZE=8
+MICRO_BATCH_SIZE=4
 GLOBAL_BATCH_SIZE=1024
 TRAIN_STEPS=25000
 

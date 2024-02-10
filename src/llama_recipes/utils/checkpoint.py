@@ -9,7 +9,6 @@ from torch.distributed.fsdp import (  # noqa: F401
 from torch.distributed.fsdp.api import FullOptimStateDictConfig
 from pathlib import Path
 import os
-from typing import Optional
 
 from megatron_lm.megatron.global_vars import get_args, get_sampler
 
@@ -94,7 +93,6 @@ def save_checkpoint(
     model: FSDP,
     optimizer: torch.optim.Optimizer,
     scheduler: torch.optim.lr_scheduler.LRScheduler,
-    sampler: Optional[torch.utils.data.distributed.DistributedSampler],
     path: str,
     iteration: int,
 ) -> None:
