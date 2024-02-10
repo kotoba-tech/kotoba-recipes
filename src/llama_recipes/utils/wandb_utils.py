@@ -179,6 +179,7 @@ def update_iter_info() -> None:
             "lr_decay_iters": args.lr_decay_iters,
             "lr_warmup_iters": args.lr_warmup_iters,
             "instruction_dataset_size": args.instruction_dataset_size,
+            "save_sampler_state": args.save_sampler_state,
         },
         allow_val_change=True
     )

@@ -9,7 +9,9 @@ from torch.distributed.fsdp import (  # noqa: F401
 from torch.distributed.fsdp.api import FullOptimStateDictConfig
 from pathlib import Path
 import os
-from megatron_lm.megatron.global_vars import get_args
+from typing import Optional
+
+from megatron_lm.megatron.global_vars import get_args, get_sampler
 
 
 def get_model_state_dict(model: FSDP) -> dict[str, torch.Tensor]:
@@ -92,6 +94,7 @@ def save_checkpoint(
     model: FSDP,
     optimizer: torch.optim.Optimizer,
     scheduler: torch.optim.lr_scheduler.LRScheduler,
+    sampler: Optional[torch.utils.data.distributed.DistributedSampler],
     path: str,
     iteration: int,
 ) -> None:
@@ -113,6 +116,13 @@ def save_checkpoint(
             model=model,
             optimizer=optimizer,
             path=f"{checkpoint_path}/optimizer.pt",
+        )
+    if args.save_sampler_state:
+        sampler = get_sampler()
+
+        save_sampler_state_dict(
+            sampler=sampler,
+            path=f"{checkpoint_path}/sampler.pt",
         )
 
     save_scheduler_state_dict(

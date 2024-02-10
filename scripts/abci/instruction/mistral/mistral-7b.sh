@@ -96,6 +96,7 @@ mpirun -np $NUM_GPUS \
   --checkpoint-type LOCAL_STATE_DICT \
   --fsdp-activation-checkpointing \
   --instruction-tuning \
+  --save-sampler-state \
   --use-mpi \
   --wandb-entity "okoge" \
   --wandb-project "kotoba-recipes-debug" \

@@ -9,7 +9,7 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 from pathlib import Path
 from llama_recipes.utils.distributed import print_rank_0
 
-from megatron_lm.megatron.global_vars import get_args
+from megatron_lm.megatron.global_vars import get_args, set_sampler
 
 
 PROMPT_DICT = {
@@ -153,6 +153,8 @@ def get_instruction_tuning_dataloader(
 
     if args.load:
         load_sampler_state_dict(sampler=train_sampler, path=args.load)
+
+    set_sampler(sampler=train_sampler)
 
     return torch.utils.data.DataLoader(
         instruction_dataset,

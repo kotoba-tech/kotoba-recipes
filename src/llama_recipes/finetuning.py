@@ -193,6 +193,7 @@ def main() -> None:
             args.train_iters = args.instruction_dataset_size // args.global_batch_size * args.epoch
             args.lr_decay_iters = args.train_iters
             args.lr_warmup_iters = args.lr_decay_iters // 10
+            args.save_sampler_state = True
             if rank == 0:
                 from llama_recipes.utils.wandb_utils import update_iter_info
                 update_iter_info()

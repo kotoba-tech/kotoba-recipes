@@ -317,5 +317,8 @@ def _add_instruction_tuning_args(parser: argparse.ArgumentParser) -> argparse.Ar
     group.add_argument(
         "--instruction-dataset-size", type=int, default=None,
     )
+    group.add_argument(
+        "--save-sampler-state", action="store_true",
+    )
 
     return parser
