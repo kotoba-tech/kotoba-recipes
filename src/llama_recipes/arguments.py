@@ -9,6 +9,7 @@ def parse_args() -> argparse.Namespace:
     parser = _add_data_args(parser=parser)
     parser = _add_training_args(parser=parser)
     parser = _add_regularization_args(parser=parser)
+    parser = _add_instruction_tuning_args(parser=parser)
 
     args = parser.parse_args()
 
@@ -293,6 +294,28 @@ def _add_regularization_args(parser: argparse.ArgumentParser) -> argparse.Argume
     group.add_argument(
         '--adam-eps', type=float, default=1e-06,
         help='Term added to the denominator to improve numerical stability'
+    )
+
+    return parser
+
+
+def _add_instruction_tuning_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    group = parser.add_argument_group(title='instruction tuning')
+
+    group.add_argument(
+        "--hf-transformer-model-dir", type=str, default=None,
+    )
+    group.add_argument(
+        "--instruction-train-data-path", type=str, default=None,
+    )
+    group.add_argument(
+        "--instruction-valid-data-path", type=str, default=None,
+    )
+    group.add_argument(
+        "--epoch", type=int, default=2,
+    )
+    group.add_argument(
+        "--instruction-dataset-size", type=int, default=None,
     )
 
     return parser

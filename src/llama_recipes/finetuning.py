@@ -170,9 +170,33 @@ def main() -> None:
             dataset=validation_dataset,
             consumed_samples=args.consumed_valid_samples,
         )
+
     else:
+        from transformers import AutoTokenizer
+        from llama_recipes.utils.instruction_tuning import get_instruction_tuning_dataloader
+
+        hf_tokenizer = AutoTokenizer.from_pretrained(
+            pretrained_model_name_or_path=args.hf_transformer_model_dir
+        )
+
         if args.instruction_tuning:
-            pass
+            train_dataloader = get_instruction_tuning_dataloader(
+                tokenizer=hf_tokenizer,  # type: ignore
+                data_path=args.instruction_train_data_path,
+                train=True,
+            )
+            validation_dataloader = get_instruction_tuning_dataloader(
+                tokenizer=hf_tokenizer,  # type: ignore
+                data_path=args.instruction_valid_data_path,
+            )
+
+            args.train_iters = args.instruction_dataset_size // args.global_batch_size * args.epoch
+            args.lr_decay_iters = args.train_iters
+            args.lr_warmup_iters = args.lr_decay_iters // 10
+            if rank == 0:
+                from llama_recipes.utils.wandb_utils import update_iter_info
+                update_iter_info()
+
         elif args.direct_preference_optimization:
             pass
         else:
