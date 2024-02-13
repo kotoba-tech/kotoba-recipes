@@ -43,7 +43,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/model/fujii/hf_checkpoints/Swallow-7b-hf/tokenizer.model
 CHECKPOINT_DIR=/model/fujii/hf_checkpoints/Swallow-7b-hf/
-CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Swallow-7b/imitatation-lr_${LR}-minlr_${MIN_LR}"
+CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Swallow-7b/imitative-lr_${LR}-minlr_${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -53,7 +53,7 @@ TRAIN_DATA_PATH=
 VALID_DATA_PATH=
 
 # job name
-JOB_NAME="Swallow-7b-VE-imitation-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
+JOB_NAME="Swallow-7b-VE-imitative-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
 
 # run
 mpirun -np $NUM_GPUS \

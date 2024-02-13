@@ -43,7 +43,7 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/model/fujii/hf_checkpoints/Mistral-7B-VE-algebraic-stack-lr_2e-5-minlr_6.6e-7_warmup_1000-iter0025000/tokenizer.model
 CHECKPOINT_DIR=/model/fujii/hf_checkpoints/Mistral-7B-VE-algebraic-stack-lr_2e-5-minlr_6.6e-7_warmup_1000-iter0025000/
-CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Mistral-7b-VE-algebric-stack/imitation-lr_${LR}-minlr_${MIN_LR}"
+CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Mistral-7b-VE-algebric-stack/imitative-lr_${LR}-minlr_${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -53,7 +53,7 @@ TRAIN_DATA_PATH=
 VALID_DATA_PATH=
 
 # job name
-JOB_NAME="Mistral-7b-VE-imitation-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
+JOB_NAME="Mistral-7b-VE-imitative-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
 
 # run
 mpirun -np $NUM_GPUS \
