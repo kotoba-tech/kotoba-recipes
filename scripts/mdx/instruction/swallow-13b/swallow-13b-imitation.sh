@@ -53,7 +53,7 @@ TRAIN_DATA_PATH=
 VALID_DATA_PATH=
 
 # job name
-JOB_NAME="Swallow-7b-VE-imitation-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
+JOB_NAME="Swallow-13b-VE-imitation-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
 
 # run
 mpirun -np $NUM_GPUS \
