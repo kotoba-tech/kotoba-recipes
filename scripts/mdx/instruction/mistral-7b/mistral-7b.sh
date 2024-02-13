@@ -49,8 +49,10 @@ mkdir -p ${CHECKPOINT_SAVE_DIR}
 
 # data config
 
-TRAIN_DATA_PATH=
-VALID_DATA_PATH=
+DATASET_DIR=/model/fujii/datasets/instruction/swallow/instruction/baseline
+
+TRAIN_DATA_PATH=${DATASET_DIR}/train.jsonl
+VALID_DATA_PATH=${DATASET_DIR}/val.jsonl
 
 # job name
 JOB_NAME="Mistral-7b-VE-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
