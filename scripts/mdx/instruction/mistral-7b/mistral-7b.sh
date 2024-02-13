@@ -19,7 +19,7 @@ NUM_GPUS=$((${NUM_NODES} * ${NUM_GPU_PER_NODE}))
 
 mkdir -p ./hostfile
 
-SGE_JOB_HOSTLIST=scripts/mdx/hostfile_
+SGE_JOB_HOSTLIST=scripts/mdx/hostfile_mistral_7b
 export SGE_JOB_HOSTLIST
 
 HOSTFILE_NAME=./hostfile/hostfile_${JOB_ID}
@@ -41,9 +41,9 @@ WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
 # checkpoint & tokenizer
-TOKENIZER_MODEL=
-CHECKPOINT_DIR=
-CHECKPOINT_SAVE_DIR="/bb/llm/gaf51275/llama/checkpoints/mistral-7b-VE/the-vault-lr_${LR}-minlr_${MIN_LR}"
+TOKENIZER_MODEL=/model/fujii/hf_checkpoints/Mistral-7B-VE-algebraic-stack-lr_2e-5-minlr_6.6e-7_warmup_1000-iter0025000/tokenizer.model
+CHECKPOINT_DIR=/model/fujii/hf_checkpoints/Mistral-7B-VE-algebraic-stack-lr_2e-5-minlr_6.6e-7_warmup_1000-iter0025000/
+CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Mistral-7b-VE-algebric-stack/lr_${LR}-minlr_${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 

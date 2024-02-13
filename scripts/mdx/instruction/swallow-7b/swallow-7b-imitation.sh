@@ -5,8 +5,8 @@ source .env/bin/activate
 
 # distributed settings
 JOB_ID=$(date +%s%N)
-export MASTER_ADDR=10.130.184.14
-export MASTER_PORT=12805
+export MASTER_ADDR=10.130.184.18
+export MASTER_PORT=12803
 
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
@@ -14,12 +14,12 @@ echo "MASTER_ADDR=${MASTER_ADDR}"
 export NUM_GPU_PER_NODE=8
 NODE_TYPE="a100"
 
-NUM_NODES=4
+NUM_NODES=2
 NUM_GPUS=$((${NUM_NODES} * ${NUM_GPU_PER_NODE}))
 
 mkdir -p ./hostfile
 
-SGE_JOB_HOSTLIST=scripts/mdx/hostfile_swallow_13b
+SGE_JOB_HOSTLIST=scripts/mdx/hostfile_swallow_7b_imi
 export SGE_JOB_HOSTLIST
 
 HOSTFILE_NAME=./hostfile/hostfile_${JOB_ID}
@@ -31,7 +31,7 @@ done <"$SGE_JOB_HOSTLIST" >"$HOSTFILE_NAME"
 SEQ_LENGTH=4096
 DATA_PARALLEL_SIZE=$NUM_GPUS
 
-MICRO_BATCH_SIZE=2
+MICRO_BATCH_SIZE=4
 GLOBAL_BATCH_SIZE=64
 
 # optimizer config
@@ -41,9 +41,9 @@ WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
 # checkpoint & tokenizer
-TOKENIZER_MODEL=/model/fujii/hf_checkpoints/Swallow-13b-hf/tokenizer.model
-CHECKPOINT_DIR=/model/fujii/hf_checkpoints/Swallow-13b-hf/
-CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Swallow-13b/lr_${LR}-minlr_${MIN_LR}"
+TOKENIZER_MODEL=/model/fujii/hf_checkpoints/Swallow-7b-hf/tokenizer.model
+CHECKPOINT_DIR=/model/fujii/hf_checkpoints/Swallow-7b-hf/
+CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Swallow-7b/imitatation-lr_${LR}-minlr_${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
@@ -53,7 +53,7 @@ TRAIN_DATA_PATH=
 VALID_DATA_PATH=
 
 # job name
-JOB_NAME="Swallow-7b-VE-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
+JOB_NAME="Swallow-7b-VE-imitation-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
 
 # run
 mpirun -np $NUM_GPUS \
@@ -101,5 +101,5 @@ mpirun -np $NUM_GPUS \
   --save-sampler-state \
   --use-mpi \
   --wandb-entity "prj-jalm" \
-  --wandb-project "Llama-2-13b-instruct" \
+  --wandb-project "Llama-2-7b-instruct" \
   --wandb-name "${JOB_NAME}"

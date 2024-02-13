@@ -19,7 +19,7 @@ NUM_GPUS=$((${NUM_NODES} * ${NUM_GPU_PER_NODE}))
 
 mkdir -p ./hostfile
 
-SGE_JOB_HOSTLIST=scripts/mdx/hostfile_
+SGE_JOB_HOSTLIST=scripts/mdx/hostfile_swallow_7b
 export SGE_JOB_HOSTLIST
 
 HOSTFILE_NAME=./hostfile/hostfile_${JOB_ID}
