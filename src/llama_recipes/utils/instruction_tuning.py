@@ -19,7 +19,7 @@ PROMPT_DICT = {
         "### 指示:\n{instruction}\n\n### 入力:\n{input}\n\n### 応答:"
     ),
     "prompt_no_input": (
-        "以下に、あるタスクを説明する指示があります。" "リクエストを適切に完了するための回答を記述してください。\n\n" "### 指示:\n{instruction}\n\n### 応答:"
+        "{instruction}"
     ),
 }
 

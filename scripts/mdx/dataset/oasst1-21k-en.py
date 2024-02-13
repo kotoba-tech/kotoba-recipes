@@ -25,19 +25,19 @@ def main() -> None:
     instruction_data = []
     output_data = []
     for conversations in tqdm(jsonl_data):
-        instruction_text: str = "以下は、タスクを説明する指示です。要求を適切に満たす応答を書きなさい。\n\n"
+        instruction_text: str = "Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n"
 
         for index, conversation in enumerate(conversations["conversations"]):
 
             if conversation["from"] == "human":
-                instruction_text += "### 指示:\n" + conversation["value"] + "\n\n"
+                instruction_text += "### Instruction:\n" + conversation["value"] + "\n\n"
             elif conversation["from"] == "gpt":
                 if len(conversations["conversations"]) == index + 1:
-                    instruction_text += "### 応答:\n"
+                    instruction_text += "### Response:\n"
                     instruction_data.append(instruction_text)
                     output_data.append(conversation["value"])
                 else:
-                    instruction_text += "### 応答:\n" + conversation["value"] + "\n\n"
+                    instruction_text += "### Response:\n" + conversation["value"] + "\n\n"
             else:
                 print(f"invalid conversation={conversation}")
 
