@@ -5,8 +5,8 @@ source .env/bin/activate
 
 # distributed settings
 JOB_ID=$(date +%s%N)
-export MASTER_ADDR=10.130.184.16
-export MASTER_PORT=12866
+export MASTER_ADDR=10.130.184.17
+export MASTER_PORT=12877
 
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
@@ -34,19 +34,19 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/model/fujii/hf_checkpoints/Swallow-13b-hf/tokenizer.model
 CHECKPOINT_DIR=/model/fujii/hf_checkpoints/Swallow-13b-hf/
-CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Swallow-13b/lr_${LR}-minlr_${MIN_LR}"
+CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Swallow-13b/ichikara-lr_${LR}-minlr_${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
 # data config
 
-DATASET_DIR=/model/fujii/datasets/instruction/swallow/instruction/baseline
+DATASET_DIR=/model/fujii/datasets/instruction/swallow/instruction/merge_ichikara
 
 TRAIN_DATA_PATH=${DATASET_DIR}/train.jsonl
 VALID_DATA_PATH=${DATASET_DIR}/val.jsonl
 
 # job name
-JOB_NAME="Swallow-13b-VE-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
+JOB_NAME="Swallow-13b-VE-ichikara-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
 
 # run
 mpirun -np $NUM_GPUS \
