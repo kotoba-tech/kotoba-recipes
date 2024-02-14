@@ -71,7 +71,6 @@ mpirun -np $NUM_GPUS \
   --micro-batch-size ${MICRO_BATCH_SIZE} \
   --global-batch-size ${GLOBAL_BATCH_SIZE} \
   --hf-transformer-model-dir ${CHECKPOINT_DIR} \
-  --train-iters ${TRAIN_STEPS} \
   --tokenizer-type Llama2Tokenizer \
   --tokenizer-model ${TOKENIZER_MODEL} \
   --instruction-train-data-path ${TRAIN_DATA_PATH} \
