@@ -95,6 +95,7 @@ mpirun -np $NUM_GPUS \
   --save ${CHECKPOINT_SAVE_DIR} \
   --load ${CHECKPOINT_SAVE_DIR} \
   --low-cpu-fsdp \
+  --fsdp-cpu-offload \
   --sharding-strategy FULL_SHARD \
   --checkpoint-type LOCAL_STATE_DICT \
   --fsdp-activation-checkpointing \
