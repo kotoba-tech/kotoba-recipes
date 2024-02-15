@@ -5,8 +5,8 @@ source .env/bin/activate
 
 # distributed settings
 JOB_ID=$(date +%s%N)
-export MASTER_ADDR=10.130.184.18
-export MASTER_PORT=12803
+export MASTER_ADDR=10.130.184.19
+export MASTER_PORT=12819
 
 echo "MASTER_ADDR=${MASTER_ADDR}"
 
@@ -14,18 +14,8 @@ echo "MASTER_ADDR=${MASTER_ADDR}"
 export NUM_GPU_PER_NODE=8
 NODE_TYPE="a100"
 
-NUM_NODES=2
+NUM_NODES=1
 NUM_GPUS=$((${NUM_NODES} * ${NUM_GPU_PER_NODE}))
-
-mkdir -p ./hostfile
-
-SGE_JOB_HOSTLIST=scripts/mdx/hostfile_swallow_7b_imi
-export SGE_JOB_HOSTLIST
-
-HOSTFILE_NAME=./hostfile/hostfile_${JOB_ID}
-while read -r line; do
-  echo "${line} slots=${NUM_GPU_PER_NODE}"
-done <"$SGE_JOB_HOSTLIST" >"$HOSTFILE_NAME"
 
 # training config
 SEQ_LENGTH=4096
@@ -43,22 +33,23 @@ GRAD_CLIP=1
 # checkpoint & tokenizer
 TOKENIZER_MODEL=/model/fujii/hf_checkpoints/Swallow-7b-hf/tokenizer.model
 CHECKPOINT_DIR=/model/fujii/hf_checkpoints/Swallow-7b-hf/
-CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Swallow-7b/imitative-lr_${LR}-minlr_${MIN_LR}"
+CHECKPOINT_SAVE_DIR="/model/fujii/checkpoints/Swallow-7b/only-imitative-lr_${LR}-minlr_${MIN_LR}"
 
 mkdir -p ${CHECKPOINT_SAVE_DIR}
 
 # data config
 
-TRAIN_DATA_PATH=
-VALID_DATA_PATH=
+DATASET_DIR=/model/fujii/datasets/instruction/swallow/instruction/only-imitative
+
+TRAIN_DATA_PATH=${DATASET_DIR}/train.jsonl
+VALID_DATA_PATH=${DATASET_DIR}/val.jsonl
 
 # job name
-JOB_NAME="Swallow-7b-VE-imitative-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
+JOB_NAME="Swallow-7b-VE-only-imitative-BS=${GLOBAL_BATCH_SIZE}-LR=${LR}-MINLR=${MIN_LR}"
 
 # run
 mpirun -np $NUM_GPUS \
   --npernode $NUM_GPU_PER_NODE \
-  -hostfile $HOSTFILE_NAME \
   -x MASTER_ADDR=$MASTER_ADDR \
   -x MASTER_PORT=$MASTER_PORT \
   -bind-to none -map-by slot \
