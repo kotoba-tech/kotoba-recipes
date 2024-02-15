@@ -2,18 +2,16 @@
 
 set -e
 
-start=0
-end=5000
-increment=500
+start=2234
+end=2234
+increment=5000
 
-tokenizer_dir=
-upload_base_dir=/upload/path
+upload_base_dir=/model/fujii/hf_checkpoints/swallow-13b/ichikara
 
 for ((i = start; i <= end; i += increment)); do
   upload_dir=$upload_base_dir/iter_$(printf "%07d" $i)
-  cp -r $tokenizer_dir/tokenizer* $upload_dir
 
   python tools/model-upload/upload.py \
     --ckpt-path $upload_dir \
-    --repo-name hf-organization/Llama2-7b-base-iter$(printf "%07d" $i)
+    --repo-name tokyotech-llm/Swallow-13b-VE-instruct-ichikara-2epoch-iter$(printf "%07d" $i)
 done
